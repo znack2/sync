@@ -84,21 +84,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../syncEngineIntegration/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+              <caret line="3" column="9" selection-start-line="3" selection-start-column="9" selection-end-line="3" selection-end-column="9" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SyncEngineConnection.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../syncEngineIntegration/src/services/SyncEngineConnection.php">
+      <file leaf-file-name="composer.json" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../syncEngineIntegration/composer.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.65384614">
-              <caret line="2" column="39" selection-start-line="2" selection-start-column="39" selection-end-line="2" selection-end-column="39" />
+            <state vertical-scroll-proportion="0.4535963">
+              <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -158,6 +158,8 @@
         <option value="$PROJECT_DIR$/../syncEngineIntegration/src/controllers/SyncEngineController.php" />
         <option value="$PROJECT_DIR$/../syncEngineIntegration/src/controllers/BaseController.php" />
         <option value="$PROJECT_DIR$/../syncEngineIntegration/src/commands/SyncEngineImport.php" />
+        <option value="$PROJECT_DIR$/../syncEngineIntegration/.gitignore" />
+        <option value="$PROJECT_DIR$/../syncEngineIntegration/composer.json" />
       </list>
     </option>
   </component>
@@ -431,7 +433,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="0" width="1665" height="1026" extended-state="1" />
+    <frame x="-8" y="0" width="1665" height="1026" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25409338" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -523,14 +525,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-15.038462">
           <caret line="24" column="19" selection-start-line="24" selection-start-column="19" selection-end-line="24" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../syncEngineIntegration/composer.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.65384614">
-          <caret line="1" column="43" selection-start-line="1" selection-start-column="32" selection-end-line="1" selection-end-column="43" />
           <folding />
         </state>
       </provider>
@@ -630,7 +624,15 @@
     <entry file="file://$PROJECT_DIR$/../syncEngineIntegration/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+          <caret line="3" column="9" selection-start-line="3" selection-start-column="9" selection-end-line="3" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../syncEngineIntegration/composer.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.4535963">
+          <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
           <folding />
         </state>
       </provider>

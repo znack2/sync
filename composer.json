@@ -1,5 +1,5 @@
 {
-    "name": "usedesk/syncengine-integration",
+    "name": "usedesk/sync-engine-integration",
     "description": "",
     "authors": [
         {
@@ -16,7 +16,7 @@
             "src/migrations"
         ],
         "psr-0": {
-            "Sourinjir\\Fbextention\\": "src/"
+            "SyncEngineIntegration\\": "src/"
         }
     },
     "minimum-stability": "stable"
