@@ -1,9 +1,9 @@
 <?php
-namespace Usedesk\SyncEngineExtention;
+namespace Usedesk\SyncEngineIntegration;
 
 use Illuminate\Support\ServiceProvider;
 
-class SyncEngineExtentionServiceProvider extends ServiceProvider {
+class SyncEngineIntegrationServiceProvider extends ServiceProvider {
 
 	const CONFIG_PATH = __DIR__ . '/src/config/Config.php';
 	/**
@@ -20,7 +20,9 @@ class SyncEngineExtentionServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$this->package('sourinjir/fbextention');
+		$this->package('usedesk/sync-engine-integration');
+		$this->loadRoutesFrom(__DIR__.'/routes/web.php');
+		$this->loadMigrationsFrom(__DIR__.'/migrations');
 	}
 
 	/**

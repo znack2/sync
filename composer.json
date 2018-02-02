@@ -1,23 +1,51 @@
 {
     "name": "usedesk/sync-engine-integration",
-    "description": "",
+    "description": "sync-engine-integration",
+    "license": "MIT",
+    "keywords": [
+        "sync-engine",
+        "integration"
+    ],
     "authors": [
         {
-            "name": "",
-            "email": ""
+            "name": "Injir",
+            "email": "sourinjir@gmail.com"
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "illuminate/support": "4.2.*"
+        "php": ">=7.0",
+        "illuminate/support": "~5.5.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "~3.5.0",
+        "phpunit/phpunit": "~6.0"
     },
     "autoload": {
-        "classmap": [
-            "src/migrations"
-        ],
-        "psr-0": {
-            "SyncEngineIntegration\\": "src/"
+        "psr-4": {
+            "Usedesk\\SyncEngineIntegration\\": "src"
         }
     },
-    "minimum-stability": "stable"
+    "autoload-dev": {
+        "psr-4": {
+            "Usedesk\\SyncEngineIntegration\\Tests\\": "tests"
+        },
+        "files": [
+            "vendor/phpunit/phpunit/src/Framework/Assert/Functions.php"
+        ]
+    },
+    "scripts": {
+        "phpunit": "phpunit"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Usedesk\\SyncEngineIntegration\\SyncEngineIntegrationServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true
+    }
 }
