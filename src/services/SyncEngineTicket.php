@@ -5,7 +5,7 @@
  * Date: 05.07.2017
  * Time: 10:56
  */
-namespace UseDesk\SyncEngineIntegration\services;
+namespace Usedesk\SyncEngineIntegration\Services;
 use Carbon\Carbon;
 use Exception;
 

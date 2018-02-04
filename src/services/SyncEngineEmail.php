@@ -1,5 +1,5 @@
 <?php
-namespace UseDesk\SyncEngineIntegration\services;
+namespace Usedesk\SyncEngineIntegration\Services;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;

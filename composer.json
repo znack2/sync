@@ -1,51 +1,58 @@
 {
-    "name": "usedesk/sync-engine-integration",
-    "description": "sync-engine-integration",
-    "license": "MIT",
-    "keywords": [
-        "sync-engine",
-        "integration"
-    ],
-    "authors": [
-        {
-            "name": "Injir",
-            "email": "sourinjir@gmail.com"
-        }
-    ],
-    "require": {
-        "php": ">=7.0",
-        "illuminate/support": "~5.5.0"
-    },
-    "require-dev": {
-        "orchestra/testbench": "~3.5.0",
-        "phpunit/phpunit": "~6.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Usedesk\\SyncEngineIntegration\\": "src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Usedesk\\SyncEngineIntegration\\Tests\\": "tests"
-        },
-        "files": [
-            "vendor/phpunit/phpunit/src/Framework/Assert/Functions.php"
-        ]
-    },
-    "scripts": {
-        "phpunit": "phpunit"
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Usedesk\\SyncEngineIntegration\\SyncEngineIntegrationServiceProvider"
-            ]
-        }
-    },
-    "config": {
-        "preferred-install": "dist",
-        "sort-packages": true,
-        "optimize-autoloader": true
+  "name": "usedesk/sync-engine-integration",
+  "description": "A sync engine integration",
+  "license": "MIT",
+  "keywords": [
+    "sync",
+    "engine",
+    "integration"
+  ],
+  "type": "library",
+  "authors": [
+    {
+      "name": "Injir",
+      "email": "sourinjir@gmail.com"
     }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "illuminate/support": "~5.5.0"
+  },
+  "require-dev": {
+    "orchestra/testbench": "~3.5.0",
+    "phpunit/phpunit": "~6.0"
+  },
+  "autoload": {
+    "classmap": [
+      "src/Controllers",
+      "src/Commands",
+      "src/Models"
+    ],
+    "psr-4": {
+      "usedesk\\SyncEngineIntegration\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "usedesk\\SyncEngineIntegration\\Tests\\": "tests"
+    },
+    "files": [
+      "vendor/phpunit/phpunit/src/Framework/Assert/Functions.php"
+    ]
+  },
+  "scripts": {
+    "phpunit": "phpunit"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "usedesk\\SyncEngineIntegration\\ServiceProvider"
+      ]
+    }
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "optimize-autoloader": true
+  }
 }

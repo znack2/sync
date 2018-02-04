@@ -1,20 +1,37 @@
 <?php
-namespace UseDesk\SyncEngineIntegration\controllers;
-use UseDesk\SyncEngineIntegration\controllers\BaseController;
+namespace Usedesk\SyncEngineIntegration\Controllers;
+use App\Http\Controllers\Controller;
 use Carbon\Carbon;
-use UseDesk\SyncEngineIntegration\models\SyncEngineChannel;
-use UseDesk\SyncEngineIntegration\services\SyncEngineEmail;
+use Faker\Provider\fr_FR\Company;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use Usedesk\SyncEngineIntegration\Services\SyncEngineEmail;
 
-class SyncEngineController extends BaseController
+class SyncEngineController extends Controller
 {
     public function __construct()
     {
 
     }
-
-    public function syncEngine(){
+    public function createChannel(Request $request){
         header('Access-Control-Allow-Origin: *');
-        $input = Input::all();
+        $response = [];
+        if($request->has('company_id') && $request->has('channel_id') && $request->has('sync_engine_id')){
+           $channel = new \SyncEngineChannel([
+                'company_id'=> $request->get('company_id'),
+                'channel_id'=> $request->get('channel_id'),
+                'sync_engine_id'=> $request->get('sync_engine_id')
+            ]);
+            $channel->save();
+            $response = ['sync_channel_id'=>$channel->id];
+        }
+        return response(json_encode($response), 200)
+            ->header('Content-Type', 'application/json');
+    }
+    public function syncEngine(Request $request){
+        header('Access-Control-Allow-Origin: *');
+        $input = $request->all();
         foreach($input as $item){
             if(isset($item['object']) && $item['object'] == "message" ){
                 $attributes = $item['attributes'];
@@ -35,10 +52,10 @@ class SyncEngineController extends BaseController
         return 0;
     }
 
-    public function saveFromSyncEngine(){
+    public function saveFromSyncEngine(Request $request){
         header('Access-Control-Allow-Origin: *');
-        $input = Input::all();
-        $attributes = null;
+        $input = $request->all();
+        $attributes = [];
         $account_id = null;
         $message_ids = [];
         $folderName = null;
@@ -75,12 +92,18 @@ class SyncEngineController extends BaseController
             $attributes['message_ids']=$message_ids;
             $attributes['folder_name']=$folderName;
             $attributes['folder_display_name']=$folderDisplayName;
-            $syncEmail = new SyncEngineEmail($attributes,$channel);
-            if($syncEmail){
-                $result = $syncEmail->saveEmail();
+            try {
+                $syncEmail = new SyncEngineEmail($attributes, $channel);
+                if ($syncEmail) {
+                    $result = $syncEmail->saveEmail();
+                }
+            }
+            catch(\Exception $e){
+                Log::alert($e);
             }
         }
-        return 0;
+        return response(json_encode($attributes), 200)
+            ->header('Content-Type', 'application/json');
     }
     public function createTicketFromSync($channel,$attributes,$is_inbound = 0){
         try {
@@ -235,7 +258,7 @@ class SyncEngineController extends BaseController
                 }
             }
         }
-        catch(Exception $e){
+        catch(\Exception $e){
             Log::alert($e);
             return false;
         }

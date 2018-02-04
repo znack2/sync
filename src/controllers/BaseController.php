@@ -1,5 +1,5 @@
 <?php
-namespace UseDesk\SyncEngineIntegration\controllers;
+namespace Usedesk\SyncEngineIntegration\Controllers;
 class BaseController extends Controller {
 
     /**

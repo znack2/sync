@@ -16,6 +16,8 @@ class SyncEngineChannelCreate extends Migration {
 		{
 			$table->increments('id');
 			$table->string('sync_engine_id')->nulable();
+			$table->string('company_id')->nulable();
+			$table->string('channel_id')->nulable();
 		});
 	}
 
