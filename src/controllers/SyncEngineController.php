@@ -17,12 +17,23 @@ class SyncEngineController extends Controller
     public function createChannel(Request $request){
         header('Access-Control-Allow-Origin: *');
         $response = [];
+        $syncRequest = [
+            'company_id'=> $request->has('company_id')?$request->get('company_id'):null,
+            'channel_id'=> $request->has('channel_id')?$request->get('channel_id'):null,
+            'sync_engine_id'=> $request->has('sync_engine_id')?$request->get('sync_engine_id'):null,
+
+            'imap_host'=> $request->has('imap_host')?$request->get('imap_host'):null,
+            'imap_port'=> $request->has('imap_port')?$request->get('imap_port'):null,
+            'imap_username'=> $request->has('imap_username')?$request->get('imap_username'):null,
+            'imap_password'=> $request->has('imap_password')?$request->get('imap_password'):null,
+
+            'smtp_host'=> $request->has('smtp_host')?$request->get('smtp_host'):null,
+            'smtp_username'=> $request->has('smtp_username')?$request->get('smtp_username'):null,
+            'smtp_password'=> $request->has('smtp_password')?$request->get('smtp_password'):null,
+            'smtp_port'=> $request->has('smtp_port')?$request->get('smtp_port'):null,
+        ];
         if($request->has('company_id') && $request->has('channel_id') && $request->has('sync_engine_id')){
-           $channel = new \SyncEngineChannel([
-                'company_id'=> $request->get('company_id'),
-                'channel_id'=> $request->get('channel_id'),
-                'sync_engine_id'=> $request->get('sync_engine_id')
-            ]);
+           $channel = new \SyncEngineChannel($syncRequest);
             $channel->save();
             $response = ['sync_channel_id'=>$channel->id];
         }
@@ -85,7 +96,7 @@ class SyncEngineController extends Controller
             }
         }
         if($account_id) {
-            $channel = SyncEngineChannel::where('sync_engine_id', $account_id)->where('deleted',false)->first();
+            $channel = SyncEngineChannel::where('sync_engine_id', $account_id)->first();
             if(!$channel){
                 return false;
             }
@@ -146,29 +157,29 @@ class SyncEngineController extends Controller
                     $is_outgoing = true;
                 }
 
-                if (!$is_outgoing) {
-                    $company_id = $channel->company_id;
-                    $client = Client::select('clients.id')
-                        ->join('client_emails', 'client_emails.client_id', '=', 'clients.id')
-                        ->where('clients.company_id', '=', $company_id)
-                        ->where('client_emails.email', $from['email'])
-                        ->first();
-
-                    //создание клиента если его нет
-                    if (!$client) {
-
-                        $client = Client::create(['name' => (empty($from['email'])) ? $from['email'] : $from['name'], 'company_id' => $company_id]);
-
-                        ClientEmail::create(['email' => $from['email'], 'client_id' => $client->id]);
-
-                        if (CompanyIntegration::boolCheck(Integration::TYPE_FULLCONTACT, $client->company_id)) {
-
-                            \UseDesk\Fullcontact\Fullcontact::socialsByEmail($client->id);
-
-                        }
-
-                    }
-                }
+//                if (!$is_outgoing) {
+//                    $company_id = $channel->company_id;
+//                    $client = Client::select('clients.id')
+//                        ->join('client_emails', 'client_emails.client_id', '=', 'clients.id')
+//                        ->where('clients.company_id', '=', $company_id)
+//                        ->where('client_emails.email', $from['email'])
+//                        ->first();
+//
+//                    //создание клиента если его нет
+//                    if (!$client) {
+//
+//                        $client = Client::create(['name' => (empty($from['email'])) ? $from['email'] : $from['name'], 'company_id' => $company_id]);
+//
+//                        ClientEmail::create(['email' => $from['email'], 'client_id' => $client->id]);
+//
+//                        if (CompanyIntegration::boolCheck(Integration::TYPE_FULLCONTACT, $client->company_id)) {
+//
+//                            \UseDesk\Fullcontact\Fullcontact::socialsByEmail($client->id);
+//
+//                        }
+//
+//                    }
+//                }
                 $thread = DB::table('sync_engine_tickets')->where('thread_id', $thread_id)->first();
                 $ticket_id = 0;
                 if ($thread) {

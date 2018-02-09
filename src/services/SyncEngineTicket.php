@@ -27,11 +27,11 @@ class SyncEngineTicket
 
     public function __construct($params, $ticket_id = 0)
     {
-        $this->setChannel(\Ticket::CHANNEL_EMAIL);
+        $this->setChannel('email');
         $this->setAdditionalId('sync');
-        $this->setStatusId(\TicketStatus::getByKey(\TicketStatus::SYSTEM_NEW)->id);
-        $this->setPriority(\Ticket::PRIORITY_MEDIUM);
-        $this->setType(\Ticket::TYPE_QUESTION);
+        $this->setStatusId(1);
+        $this->setPriority("medium");
+        $this->setType('question');
         $this->setCompanyId($this->company_id);
         if(is_array($params)){
             $this->fillFromArray($params);
