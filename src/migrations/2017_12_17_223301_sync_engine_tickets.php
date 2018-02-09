@@ -16,7 +16,7 @@ class SyncEngineTickets extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('ticket_id')->unsigned()->nullable();
-			$table->foreign('ticket_id', 'sync_engine_ticket_ticket_id_foreign')->references('id')->on('tickets')->onUpdate('RESTRICT')->onDelete('CASCADE');
+//			$table->foreign('ticket_id', 'sync_engine_ticket_ticket_id_foreign')->references('id')->on('tickets')->onUpdate('RESTRICT')->onDelete('CASCADE');
 			$table->string('thread_id')->nullable();
 
 		});

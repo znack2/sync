@@ -16,9 +16,9 @@ class SyncEngineTicketComments extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('ticket_id')->unsigned()->nullable();
-			$table->foreign('ticket_id', 'sync_engine_ticket_comments_ticket_id_foreign')->references('id')->on('tickets')->onUpdate('RESTRICT')->onDelete('CASCADE');
+//			$table->foreign('ticket_id', 'sync_engine_ticket_comments_ticket_id_foreign')->references('id')->on('tickets')->onUpdate('RESTRICT')->onDelete('CASCADE');
 			$table->integer('comment_id')->unsigned()->nullable();
-			$table->foreign('comment_id', 'sync_engine_comment_ticket_comment_id_foreign')->references('id')->on('ticket_comments')->onUpdate('RESTRICT')->onDelete('CASCADE');
+//			$table->foreign('comment_id', 'sync_engine_comment_ticket_comment_id_foreign')->references('id')->on('ticket_comments')->onUpdate('RESTRICT')->onDelete('CASCADE');
 			$table->string('sync_engine_id')->nullable();
 
 		});
