@@ -6,6 +6,14 @@ use Usedesk\SyncEngineIntegration\Services\SyncEngineEmail;
 
 class SyncEngineController
 {
+
+    private $addr;
+
+    public function __construct()
+    {
+        $this->addr =  env('SYNC-ENGINE-ADDR', '127.0.0.1:5555');
+    }
+
     public function createChannel(Request $request){
         $response = [];
 
@@ -118,7 +126,7 @@ class SyncEngineController
                 foreach ($attributes['files'] as $file) {
                     if (isset($file['id'])) {
                         $file_id = $file['id'];
-                        $files[] = 'http://' . ($data['account_id']) . '@' . env('SYNC-ENGINE-ADDR', '127.0.0.1:5555') .'/files/' . $file_id . '/download';
+                        $files[] = 'http://' . ($data['account_id']) . '@' . $this->addr .'/files/' . $file_id . '/download';
                     }
                 }
             }
@@ -130,4 +138,10 @@ class SyncEngineController
             return false;
         }
     }
+
+    public function accounts()
+    {
+        return json_decode(file_get_contents($this->addr . '/accounts'));
+    }
+
 }

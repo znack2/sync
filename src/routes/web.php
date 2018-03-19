@@ -6,4 +6,5 @@ Route::group(['namespace' => 'Usedesk\SyncEngineIntegration\Controllers'], funct
 {
    Route::any('/v1/syncEngine', ['uses' => 'SyncEngineController@syncEngine']);
    Route::any('/v1/syncEngine/create-channel', ['uses' => 'SyncEngineController@createChannel']);
+   Route::get('/v1/syncEngine/accounts', ['uses' => 'SyncEngineController@accounts']);
 });
