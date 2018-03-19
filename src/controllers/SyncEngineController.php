@@ -1,19 +1,11 @@
 <?php
 namespace Usedesk\SyncEngineIntegration\Controllers;
-use App\Http\Controllers\Controller;
-use Carbon\Carbon;
-use Faker\Provider\fr_FR\Company;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Usedesk\SyncEngineIntegration\Services\SyncEngineEmail;
 
-class SyncEngineController extends Controller
+class SyncEngineController
 {
-    public function __construct()
-    {
-
-    }
     public function createChannel(Request $request){
         header('Access-Control-Allow-Origin: *');
         $response = [];
@@ -40,31 +32,24 @@ class SyncEngineController extends Controller
         return response(json_encode($response), 200)
             ->header('Content-Type', 'application/json');
     }
+
+
     public function syncEngine(Request $request){
-        header('Access-Control-Allow-Origin: *');
         $input = $request->all();
         foreach($input as $item){
-            if(isset($item['object']) && $item['object'] == "message" ){
-                $attributes = $item['attributes'];
-                $account_id = 0;
-                if(isset($attributes['account_id'])){
-                    $account_id = $attributes['account_id'];
-                }
-                if($account_id) {
-                    $channel = SyncEngineChannel::where('sync_engine_id', $account_id)->first();
-                    $this->createTicketFromSync($channel,$attributes);
-                    continue;
-                }
-                else{
-                    continue;
-                }
+            $object = $item['object'] ?? null;
+            $event = $item['event'] ?? null;
+
+            if ($object != 'message' or $event != 'create') {
+                continue;
             }
+
+            $this->createTicketFromSync($item['attributes']);
         }
-        return 0;
+        return 'ok';
     }
 
     public function saveFromSyncEngine(Request $request){
-        header('Access-Control-Allow-Origin: *');
         $input = $request->all();
         $attributes = [];
         $account_id = null;
@@ -116,158 +101,44 @@ class SyncEngineController extends Controller
         return response(json_encode($attributes), 200)
             ->header('Content-Type', 'application/json');
     }
-    public function createTicketFromSync($channel,$attributes,$is_inbound = 0){
+
+    public function createTicketFromSync($attributes) {
         try {
-            $message = "";
-            if (isset($attributes['body'])) {
-                $message = $attributes['body'];
-            }
-            $subject = "";
-            if (isset($attributes['subject'])) {
-                $subject = $attributes['subject'];
-            }
-            $id = "";
-            if (isset($attributes['id'])) {
-                $id = $attributes['id'];
-            }
-            $from = ['name' => "", 'email' => ""];
-            if (isset($attributes['from']) && isset($attributes['from'][0])) {
-                $from['email'] = $attributes['from'][0]['email'];
-                $from['name'] = $attributes['from'][0]['name'];
-            }
-            $account_id = 0;
-            if (isset($attributes['account_id'])) {
-                $account_id = $attributes['account_id'];
-            }
-            $thread_id = 0;
-            if (isset($attributes['thread_id'])) {
-                $thread_id = $attributes['thread_id'];
-            }
-            $date = Carbon::now();
-            if (isset($attributes['date'])) {
-                $date = Carbon::createFromTimestamp($attributes['date']);
-            }
+            $data = [];
 
-            $sync_comment = DB::table('sync_engine_ticket_comments')->where('sync_engine_id', $id)->first();
-            if ($sync_comment) {
-                return false;
-            } else {
-                $is_outgoing = false;
-                if ($from['email'] == $channel->imap_username) {
-                    $is_outgoing = true;
+            $need = ['body', 'from', 'account_id', 'thread_id', 'snippet', 'id', 'subject'];
+
+            foreach ($need as $key) {
+                $row = $attributes[$key] ?? null;
+
+                if ($row === null) {
+                    continue;
                 }
 
-//                if (!$is_outgoing) {
-//                    $company_id = $channel->company_id;
-//                    $client = Client::select('clients.id')
-//                        ->join('client_emails', 'client_emails.client_id', '=', 'clients.id')
-//                        ->where('clients.company_id', '=', $company_id)
-//                        ->where('client_emails.email', $from['email'])
-//                        ->first();
-//
-//                    //создание клиента если его нет
-//                    if (!$client) {
-//
-//                        $client = Client::create(['name' => (empty($from['email'])) ? $from['email'] : $from['name'], 'company_id' => $company_id]);
-//
-//                        ClientEmail::create(['email' => $from['email'], 'client_id' => $client->id]);
-//
-//                        if (CompanyIntegration::boolCheck(Integration::TYPE_FULLCONTACT, $client->company_id)) {
-//
-//                            \UseDesk\Fullcontact\Fullcontact::socialsByEmail($client->id);
-//
-//                        }
-//
-//                    }
-//                }
-                $thread = DB::table('sync_engine_tickets')->where('thread_id', $thread_id)->first();
-                $ticket_id = 0;
-                if ($thread) {
-                    $ticket_id = $thread->ticket_id;
+                if (is_array($key) or is_object($key)) {
+                    $data[$key] = json_encode($row);
+                    continue;
                 }
 
-                if (!$ticket_id) {
-                    $ticket = new Ticket(['channel' => Ticket::CHANNEL_EMAIL]);
-                    $ticket->fill(['email_channel_id' => $channel->id, 'subject' => $subject]);
-                    if (!$is_outgoing && $client->id) {
-                        $ticket->client_id = $client->id;
-                    }
-                    $ticket->status_id = TicketStatus::getByKey(TicketStatus::SYSTEM_NEW)->id;
-                    $ticket->priority = Ticket::PRIORITY_MEDIUM;
-                    $ticket->type = Ticket::TYPE_QUESTION;
-                    $ticket->email_channel_subject = $subject;
-                    $ticket->email_channel_email = $from['email'];
-                    $ticket->company_id = $company_id;
-                    $ticket->setStatusUpdatedAt($date);
-                    $ticket->last_updated_at = $date;
-                    $ticket->published_at = $date;
-                    $ticket->additional_id = "sync";
-                    $ticket->save();
-                    $ticket_id = $ticket->id;
-                    DB::table('sync_engine_tickets')->insert([
-                        'ticket_id' => $ticket_id,
-                        'thread_id' => $thread_id
-                    ]);
-                }
+                $data[$key] = $row;
+            }
 
-                $query = [
-                    'type' => 'public',
-                    'message' => $message,
-                    'ticket_id' => $ticket_id,
-                    'published_at' => $date,
-                ];
-                if (!$is_outgoing && isset($client)) {
-                    $query['from'] = "client";
-                    $query['client_id'] = $client->id;
-                } else {
-                    $user = User::where('company_id', $channel->company_id)->first();
-                    $query['from'] = "user";
-                    $query['user_id'] = $user->id;
-                }
-                $ticketComment = new TicketComment($query);
-                $ticketComment->save();
-                DB::table('sync_engine_ticket_comments')->insert([
-                    'ticket_id' => $ticket_id,
-                    'comment_id' => $ticketComment->id,
-                    'sync_engine_id' => $id
-                ]);
+            if (!empty($attributes['date'])) {
+                $data['date'] = date("Y-m-d H:i:s", $attributes['date']->{'$date'});
+            }
 
-                if(isset($attributes['to']) && count($attributes['to'])>1){
-                    foreach($attributes['to'] as $item){
-                        if(isset($item[1]) && $channel->imap_username !== $item[1]){
-                            TicketCommentCopyEmail::saveEmailCopy($item[1], TicketCommentCopyEmail::TYPE_CC, $ticketComment->id);
-                        }
+            $files = [];
+
+            if (isset($attributes['files'])) {
+                foreach ($attributes['files'] as $file) {
+                    if (isset($file['id'])) {
+                        $file_id = $file['id'];
+                        $files[] = 'http://' . ($data['account_id']) . '@' . env('SYNC-ENGINE-ADDR', '127.0.0.1:5555') .'/files/' . $file_id . '/download';
                     }
                 }
-                if(isset($attributes['cc']) && count($attributes['cc'])>1){
-                    foreach($attributes['cc'] as $item){
-                        if(isset($item[1]) && $channel->imap_username !== $item[1]){
-                            TicketCommentCopyEmail::saveEmailCopy($item[1], TicketCommentCopyEmail::TYPE_CC, $ticketComment->id);
-                        }
-                    }
-                }
-                if(isset($attributes['bcc']) && count($attributes['bcc'])>1){
-                    foreach($attributes['bcc'] as $item){
-                        if(isset($item[1]) && $channel->imap_username !== $item[1]){
-                            TicketCommentCopyEmail::saveEmailCopy($item[1], TicketCommentCopyEmail::TYPE_BCC, $ticketComment->id);
-                        }
-                    }
-                }
-                if (isset($attributes['files'])) {
-                    $files = $attributes['files'];
-                    foreach ($files as $file) {
-                        if (isset($file['id'])) {
-                            $file_id = $file['id'];
-                            $url = 'http://' . $account_id . '@188.93.209.204:15555/files/' . $file_id . '/download';
-                            DB::table('ticket_comment_files')->insert([
-                                'ticket_comment_id' => $ticketComment->id,
-                                'file' => $url
-                            ]);
-                        }
-                    }
-
-                }
             }
+
+            dispatch(new CreateTicket($attributes, $files));
         }
         catch(\Exception $e){
             Log::alert($e);
