@@ -2,6 +2,7 @@
 namespace Usedesk\SyncEngineIntegration\Controllers;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use usedesk\SyncEngineIntegration\helpers\SyncEngineHelper;
 use Usedesk\SyncEngineIntegration\Services\SyncEngineEmail;
 
 class SyncEngineController
@@ -11,17 +12,16 @@ class SyncEngineController
 
     public function __construct()
     {
-        $this->addr =  env('SYNC-ENGINE-ADDR', '127.0.0.1:5555');
+        $this->addr =  SyncEngineHelper::getAddr();
     }
 
     public function createChannel(Request $request){
-        $response = [];
-
-        if($request->has('company_id') && $request->has('channel_id') && $request->has('sync_engine_id')){
-           $channel = new \SyncEngineChannel($request->all());
-            $channel->save();
-            $response = ['sync_channel_id'=>$channel->id];
+        if($request->has('name') and $request->has('email_address') and $request->has('password')) {
+            $response = SyncEngineHelper::createAccount($request->all());
+        } else {
+            $response = ['error' => 'data error'];
         }
+
         return response(json_encode($response), 200)
             ->header('Content-Type', 'application/json');
     }
