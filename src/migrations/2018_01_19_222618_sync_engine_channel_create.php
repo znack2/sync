@@ -18,7 +18,6 @@ class SyncEngineChannelCreate extends Migration {
 			$table->string('sync_engine_id')->nulable();
 			$table->string('company_id')->nulable();
 			$table->string('channel_id')->nulable();
-			$table->string('channel_id')->nulable();
 			$table->string('imap_host')->nulable();
 			$table->string('imap_port')->nulable();
 			$table->string('imap_username')->nulable();
@@ -27,6 +26,7 @@ class SyncEngineChannelCreate extends Migration {
 			$table->string('smtp_port')->nulable();
 			$table->string('smtp_username')->nulable();
 			$table->string('smtp_password')->nulable();
+			$table->timestamps();
 		});
 	}
 
