@@ -5,4 +5,5 @@ Route::get('/test', function () {
 Route::group(['namespace' => 'Usedesk\SyncEngineIntegration\Controllers'], function()
 {
    Route::any('/v1/syncEngine', ['uses' => 'SyncEngineController@syncEngine']);
+   Route::any('/v1/syncEngine/create-channel', ['uses' => 'SyncEngineController@createChannel']);
 });

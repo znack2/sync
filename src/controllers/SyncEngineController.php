@@ -7,25 +7,10 @@ use Usedesk\SyncEngineIntegration\Services\SyncEngineEmail;
 class SyncEngineController
 {
     public function createChannel(Request $request){
-        header('Access-Control-Allow-Origin: *');
         $response = [];
-        $syncRequest = [
-            'company_id'=> $request->has('company_id')?$request->get('company_id'):null,
-            'channel_id'=> $request->has('channel_id')?$request->get('channel_id'):null,
-            'sync_engine_id'=> $request->has('sync_engine_id')?$request->get('sync_engine_id'):null,
 
-            'imap_host'=> $request->has('imap_host')?$request->get('imap_host'):null,
-            'imap_port'=> $request->has('imap_port')?$request->get('imap_port'):null,
-            'imap_username'=> $request->has('imap_username')?$request->get('imap_username'):null,
-            'imap_password'=> $request->has('imap_password')?$request->get('imap_password'):null,
-
-            'smtp_host'=> $request->has('smtp_host')?$request->get('smtp_host'):null,
-            'smtp_username'=> $request->has('smtp_username')?$request->get('smtp_username'):null,
-            'smtp_password'=> $request->has('smtp_password')?$request->get('smtp_password'):null,
-            'smtp_port'=> $request->has('smtp_port')?$request->get('smtp_port'):null,
-        ];
         if($request->has('company_id') && $request->has('channel_id') && $request->has('sync_engine_id')){
-           $channel = new \SyncEngineChannel($syncRequest);
+           $channel = new \SyncEngineChannel($request->all());
             $channel->save();
             $response = ['sync_channel_id'=>$channel->id];
         }
