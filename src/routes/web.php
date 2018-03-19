@@ -4,5 +4,5 @@ Route::get('/test', function () {
 });
 Route::group(['namespace' => 'Usedesk\SyncEngineIntegration\Controllers'], function()
 {
-   Route::any('/v1/syncEngine', ['uses' => 'SyncEngineController@saveFromSyncEngine']);
+   Route::any('/v1/syncEngine', ['uses' => 'SyncEngineController@syncEngine']);
 });
