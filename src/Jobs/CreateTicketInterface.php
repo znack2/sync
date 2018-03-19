@@ -1,6 +1,6 @@
 <?php
 
-namespace Usedesk\SyncEngineIntegration\Jobs;
+namespace usedesk\SyncEngineIntegration\Jobs;
 
 interface CreateTicketInterface {
 

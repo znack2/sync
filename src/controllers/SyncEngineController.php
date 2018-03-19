@@ -124,7 +124,7 @@ class SyncEngineController
             }
 
             if (!empty($attributes['date'])) {
-                $data['date'] = date("Y-m-d H:i:s", $attributes['date']->{'$date'});
+                $data['date'] = date("Y-m-d H:i:s", $attributes['date']['$date']);
             }
 
             $files = [];
@@ -138,7 +138,7 @@ class SyncEngineController
                 }
             }
 
-            dispatch(new App\Jobs\Ticket\CreateTicketSyncEngine($attributes, $files));
+            dispatch(new \App\Jobs\Ticket\CreateTicketSyncEngine($attributes, $files));
         }
         catch(\Exception $e){
             Log::alert($e);
