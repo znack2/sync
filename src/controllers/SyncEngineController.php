@@ -138,7 +138,7 @@ class SyncEngineController
                 }
             }
 
-            dispatch(new CreateTicket($attributes, $files));
+            dispatch(new App\Jobs\Ticket\CreateTicketSyncEngine($attributes, $files));
         }
         catch(\Exception $e){
             Log::alert($e);
