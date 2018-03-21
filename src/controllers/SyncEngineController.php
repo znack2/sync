@@ -15,6 +15,10 @@ class SyncEngineController
         $this->addr =  SyncEngineHelper::getAddr();
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     */
     public function createChannel(Request $request){
         if($request->has('name') and $request->has('email_address') and $request->has('password')) {
             $response = SyncEngineHelper::createAccount($request->all());
@@ -26,7 +30,10 @@ class SyncEngineController
             ->header('Content-Type', 'application/json');
     }
 
-
+    /**
+     * @param Request $request
+     * @return string
+     */
     public function syncEngine(Request $request){
         $input = $request->all();
         foreach($input as $item){
@@ -42,59 +49,10 @@ class SyncEngineController
         return 'ok';
     }
 
-    public function saveFromSyncEngine(Request $request){
-        $input = $request->all();
-        $attributes = [];
-        $account_id = null;
-        $message_ids = [];
-        $folderName = null;
-        $folderDisplayName = null;
-        foreach($input as $item){
-            if(isset($item['object']) && $item['object'] == "message" ){
-                $attributes = $item['attributes'];
-                $account_id = 0;
-                if(isset($attributes['account_id'])){
-                    $account_id = $attributes['account_id'];
-                }
-            }
-
-            if(isset($item['attributes']) && isset($item['attributes']['message_ids']) && !count($message_ids)){
-                $message_ids = $item['attributes']['message_ids'];
-            }
-            if(isset($item['attributes']) && isset($item['attributes']['folder'])){
-                $folder = $item['attributes']['folder'];
-
-                if(isset($folder['name']) && !$folderName){
-                    $folderName = $folder['name'];
-                }
-
-                if(isset($folder['display_name']) && !$folderDisplayName){
-                    $folderDisplayName = $folder['display_name'];
-                }
-            }
-        }
-        if($account_id) {
-            $channel = SyncEngineChannel::where('sync_engine_id', $account_id)->first();
-            if(!$channel){
-                return false;
-            }
-            $attributes['message_ids']=$message_ids;
-            $attributes['folder_name']=$folderName;
-            $attributes['folder_display_name']=$folderDisplayName;
-            try {
-                $syncEmail = new SyncEngineEmail($attributes, $channel);
-                if ($syncEmail) {
-                    $result = $syncEmail->saveEmail();
-                }
-            }
-            catch(\Exception $e){
-                Log::alert($e);
-            }
-        }
-        return response(json_encode($attributes), 200)
-            ->header('Content-Type', 'application/json');
-    }
-
+    /**
+     * @param $attributes
+     * @return bool
+     */
     public function createTicketFromSync($attributes) {
         try {
             $data = [];
