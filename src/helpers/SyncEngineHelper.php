@@ -1,5 +1,5 @@
 <?php
-namespace usedesk\SyncEngineIntegration\helpers;
+namespace Usedesk\SyncEngineIntegration\helpers;
 
 class SyncEngineHelper {
 

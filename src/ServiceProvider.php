@@ -1,8 +1,7 @@
 <?php
 
-namespace usedesk\SyncEngineIntegration;
+namespace Usedesk\SyncEngineIntegration;
 
-use Usedesk\SyncEngineIntegration\Commands\SyncEngineImport;
 
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
@@ -32,10 +31,6 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
     }
     protected function registerCommand()
     {
-        $this->app->singleton('import:syncengine', function($app) {
 
-            return new SyncEngineImport();
-        });
-        $this->commands('import:syncengine');
     }
 }

@@ -1,8 +1,9 @@
 <?php
 namespace Usedesk\SyncEngineIntegration\Controllers;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
-use usedesk\SyncEngineIntegration\helpers\SyncEngineHelper;
+use Usedesk\SyncEngineIntegration\helpers\SyncEngineHelper;
 use Usedesk\SyncEngineIntegration\Services\SyncEngineEmail;
 
 class SyncEngineController
@@ -89,7 +90,34 @@ class SyncEngineController
                 }
             }
 
-            dispatch(new \App\Jobs\Ticket\CreateTicketSyncEngine($attributes, $files));
+            $channel = $this->getChannel($attributes['to'][0]['email']);
+
+            $client_id = dispatch_now(new \App\Jobs\Client\FindOrCreateClient(
+                $channel->company_id,
+                'email',
+                [
+                    'email' => $attributes['from'][0]['email'],
+                    'client' => ['company_id' => $channel->company_id]
+                ]
+            ));
+
+            dispatch(new \App\Jobs\Ticket\AddComment(
+                $channel->company_id,
+                null, //ticket_id
+                [
+                    'type' => 'App\Models\Client\Client', //owner
+                    'id' => $client_id,
+                ],
+                [$client_id], //clients
+                [ //channel
+                    'id' => $channel->id,
+                    'type' => 'email',
+                ],
+                [ //message
+                    'message' => $attributes['body'],
+                    'has_file' => !empty($files)
+                ]
+                ));
         }
         catch(\Exception $e){
             Log::alert($e);
@@ -100,6 +128,22 @@ class SyncEngineController
     public function accounts()
     {
         return json_decode(file_get_contents($this->addr . '/accounts'));
+    }
+
+    /**
+     * @param $email
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function getChannel($email)
+    {
+            $channel = DB::table('email_channels')->where('incoming_email', $email)->first();
+
+            if (!$channel) {
+                throw new \Exception('Channel not found');
+            }
+
+            return $channel;
     }
 
 }
