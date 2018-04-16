@@ -8,7 +8,7 @@ class SyncEngineHelper {
     public static function getAddr()
     {
         if (!self::$addr) {
-            self::$addr = env('SYNC_ENGINE_ADDR', 'http://127.0.0.1:5555');
+            self::$addr = env('SYNC_ENGINE_ADDR', 'localhost:5555');
         }
 
         return self::$addr;
@@ -19,17 +19,18 @@ class SyncEngineHelper {
         $context = stream_context_create(array(
             'http' => array(
                 'method' => 'POST',
-                'header' => 'Content-Type: application/x-www-form-urlencoded' . PHP_EOL,
-                'content' => http_build_query($params),
+                'header' => 'Content-Type: application/json' . PHP_EOL,
+                'content' => json_encode($params),
+                'ignore_errors' => true
             ),
         ));
 
         $response = file_get_contents(
-            self::getAddr() . '/connect/authorize',
-            $use_include_path = false,
+            'http://' . self::getAddr() . '/connect/authorize',
+            false,
             $context);
 
-        return json_encode($response);
+        return json_decode($response, true);
     }
 
 }
