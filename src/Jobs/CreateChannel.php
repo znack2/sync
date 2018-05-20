@@ -16,15 +16,17 @@ class CreateChannel implements ShouldQueue {
     private $email;
     private $password;
     private $params;
+    private $reauth;
 
     private $syncHelper;
 
-    public function __construct(string $name, string $email, string $password = '', array $params = [])
+    public function __construct(string $name, string $email, string $password = '', array $params = [], $reauth = false)
     {
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
         $this->params = $params;
+        $this->reauth = $reauth;
     }
 
     public function handle()
@@ -32,7 +34,7 @@ class CreateChannel implements ShouldQueue {
         $params = [
             'name' => $this->name,
             'email_address' => $this->email,
-            'reauth' => true,
+            'reauth' => $this->reauth,
         ];
 
         if (!empty($this->params['auth_code'])) {
