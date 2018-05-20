@@ -115,7 +115,10 @@ class SyncEngineController
                 ],
                 [ //message
                     'message' => $attributes['body'],
-                    'has_file' => !empty($files)
+                    'subject' => $attributes['subject'],
+                    'is_html' => true,
+                    'has_file' => !empty($files),
+                    'file_list' => $files,
                 ]
                 ));
         }
