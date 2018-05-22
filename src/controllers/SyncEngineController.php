@@ -47,6 +47,7 @@ class SyncEngineController
 
             $this->createTicketFromSync($item['attributes']);
         }
+
         return 'ok';
     }
 
@@ -108,7 +109,7 @@ class SyncEngineController
                     'type' => 'App\Models\Client\Client', //owner
                     'id' => $client_id,
                 ],
-                [$client_id], //clients
+                [$client_id => $attributes['from'][0]['email']], //clients
                 [ //channel
                     'id' => $channel->id,
                     'type' => 'email',
@@ -119,6 +120,7 @@ class SyncEngineController
                     'is_html' => true,
                     'has_file' => !empty($files),
                     'file_list' => $files,
+                    'all_data' => $data,
                 ]
                 ));
         }
@@ -143,7 +145,7 @@ class SyncEngineController
             $channel = DB::table('email_channels')->where('incoming_email', $email)->first();
 
             if (!$channel) {
-                throw new \Exception('Channel not found');
+                throw new \Exception('Channel not found - ' . $email);
             }
 
             return $channel;
