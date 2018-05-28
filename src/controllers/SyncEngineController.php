@@ -102,26 +102,47 @@ class SyncEngineController
                 ]
             ));
 
-            dispatch(new \App\Jobs\Ticket\AddComment(
+            if (!$ticket_id = $this->findTicketById($attributes['body'], $attributes['thread_id'])) {
+                $ticket = App\Jobs\Ticket\FindOrCreateTicket(
+                    $channel->company_id,
+                    [ //owner
+                        'type' => 'App\Models\Client\Client', //owner
+                        'id' => $client_id,
+                    ],
+                    $channel->id,
+                    'email', //channel type
+                    $attributes['thread_id'],
+                    $attributes['subject'],
+                    $data['date'] ?? date("Y-m-d H:i:s")
+                );
+
+                $ticket_id = $ticket->id;
+            }
+
+            dispatch(new \App\Jobs\Comment\AddComment(
                 $channel->company_id,
-                null, //ticket_id
+                $ticket_id,
+                0, //user_id
                 [
                     'type' => 'App\Models\Client\Client', //owner
                     'id' => $client_id,
                 ],
-                [$client_id => $attributes['from'][0]['email']], //clients
-                [ //channel
-                    'id' => $channel->id,
-                    'type' => 'email',
-                ],
-                [ //message
+                [ //request data
+                    'user_type' => 'client',
+                    'message_type' => 'public',
                     'message' => $attributes['body'],
                     'subject' => $attributes['subject'],
                     'is_html' => true,
                     'has_file' => !empty($files),
-                    'file_list' => $files,
                     'all_data' => $data,
-                ]
+
+                    'channel_type' => 'email',
+                    'channel_id' => $channel->id,
+                    'from_client' => [
+                        $client_id => $attributes['from'][0]['email']
+                    ]
+                ],
+                $files
                 ));
         }
         catch(\Exception $e){
@@ -149,6 +170,18 @@ class SyncEngineController
             }
 
             return $channel;
+    }
+
+    protected function findTicketById($message, $thread_id)
+    {
+        preg_match('/\<span ticket_id="([0-9]+)">/i', $message, $matches);
+
+        if ($matches) {
+            DB::table('tickets')->where('id', $matches[1])->update(['thread_id' => $thread_id]);
+            return $matches[1];
+        }
+
+        return null;
     }
 
 }
