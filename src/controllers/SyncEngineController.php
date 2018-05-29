@@ -103,7 +103,7 @@ class SyncEngineController
             ));
 
             if (!$ticket_id = $this->findTicketById($attributes['body'], $attributes['thread_id'])) {
-                $ticket = App\Jobs\Ticket\FindOrCreateTicket(
+                $ticket = dispatch_now(App\Jobs\Ticket\FindOrCreateTicket(
                     $channel->company_id,
                     [ //owner
                         'type' => 'App\Models\Client\Client', //owner
@@ -114,7 +114,7 @@ class SyncEngineController
                     $attributes['thread_id'],
                     $attributes['subject'],
                     $data['date'] ?? date("Y-m-d H:i:s")
-                );
+                ));
 
                 $ticket_id = $ticket->id;
             }
