@@ -93,12 +93,17 @@ class SyncEngineController
 
             $channel = $this->getChannel($attributes['to'][0]['email']);
 
+            $name = $attributes['from'][0]['name'] ?? '';
+            $name = explode(' ', $name);
+
             $client_id = dispatch_now(new \App\Jobs\Client\FindOrCreateClient(
                 $channel->company_id,
                 'email',
                 [
                     'email' => $attributes['from'][0]['email'],
-                    'client' => ['company_id' => $channel->company_id]
+                    'client' => ['company_id' => $channel->company_id],
+                    'first_name' => !empty($name[0]) ? $name[0] : $attributes['from'][0]['email'],
+                    'last_name' => $name[1] ?? '',
                 ]
             ));
 
