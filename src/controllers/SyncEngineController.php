@@ -86,7 +86,16 @@ class SyncEngineController
                 foreach ($attributes['files'] as $file) {
                     if (isset($file['id'])) {
                         $file_id = $file['id'];
-                        $files[] = 'http://' . ($data['account_id']) . '@' . $this->addr .'/files/' . $file_id . '/download';
+                        $file_data = [
+                            'url' => 'http://' . ($data['account_id']) . '@' . $this->addr .'/files/' . $file_id . '/download',
+                            'filename' => $file['filename'],
+                        ];
+
+                        if (!empty($file['content_id'])) {
+                            $file_data['content_id'] = $file['content_id'];
+                        }
+
+                        $files[] = $file_data;
                     }
                 }
             }
