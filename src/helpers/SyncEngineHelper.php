@@ -33,4 +33,9 @@ class SyncEngineHelper {
         return json_decode($response, true);
     }
 
+    public function deleteAccount(string $account_id)
+    {
+
+    }
+
 }

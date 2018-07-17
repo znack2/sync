@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Usedesk\SyncEngineIntegration\helpers\SyncEngineHelper;
+use Usedesk\SyncEngineIntegration\Jobs\DeleteChannel;
 use Usedesk\SyncEngineIntegration\Services\SyncEngineEmail;
 
 class SyncEngineController
@@ -78,6 +79,8 @@ class SyncEngineController
 
             if (!empty($attributes['date'])) {
                 $data['date'] = date("Y-m-d H:i:s", $attributes['date']['$date']);
+            } else {
+                $data['date'] = date("Y-m-d H:i:s");
             }
 
             $files = [];
@@ -115,6 +118,10 @@ class SyncEngineController
                     'last_name' => $name[1] ?? '',
                 ]
             ));
+
+            if (dispatch_now(new \App\Jobs\Ticket\CheckDouble($channel->company_id, $client_id, $data['subject'], $data['date']))) {
+                return false;
+            }
 
             if (!$ticket_id = $this->findTicketById($attributes['body'], $attributes['thread_id'])) {
                 $ticket = dispatch_now(new \App\Jobs\Ticket\FindOrCreateTicket(
@@ -163,6 +170,17 @@ class SyncEngineController
             Log::alert($e);
             return false;
         }
+    }
+
+    public function deleteChannel(Request $request)
+    {
+
+        dispatch(new DeleteChannel($request->input('channel_id')));
+
+        return response([
+            'success' => true,
+            'message' => 'channel deleted succeesfully',
+        ]);
     }
 
     public function accounts()
