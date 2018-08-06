@@ -1,34 +1,35 @@
 <?php
-namespace Usedesk\SyncEngineIntegration\helpers;
+
+namespace Usedesk\Sync\Helpers;
 
 class SyncEngineHelper {
 
-    private static $addr;
+    private $service;
 
-    public static function getAddr()
+    public function __construct()
     {
-        if (!self::$addr) {
-            self::$addr = env('SYNC_ENGINE_ADDR', 'localhost:5555');
-        }
-
-        return self::$addr;
+        $this->service = config('connection.host');
     }
 
-    public static function createAccount(array $params)
+    public function createAccount(string $email, string $password)
     {
-        $context = stream_context_create(array(
-            'http' => array(
+        $params = [
+            'email'=>$email,
+            'password'=>$password
+        ];
+
+        $context = stream_context_create([
+            'http' => [
                 'method' => 'POST',
                 'header' => 'Content-Type: application/json' . PHP_EOL,
                 'content' => json_encode($params),
                 'ignore_errors' => true
-            ),
-        ));
+            ],
+        ]);
 
-        $response = file_get_contents(
-            'http://' . self::getAddr() . '/connect/authorize',
-            false,
-            $context);
+        $path = 'http://' . $this->service . '/connect/authorize';
+
+        $response = file_get_contents($path, false, $context);
 
         return json_decode($response, true);
     }

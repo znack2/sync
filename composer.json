@@ -1,40 +1,27 @@
 {
-  "name": "Usedesk/SyncEngineIntegration",
+  "name": "Usedesk/Sync",
   "description": "A sync engine integration",
   "license": "MIT",
-  "keywords": [
-    "sync",
-    "engine",
-    "integration"
-  ],
-  "type": "library",
-  "authors": [
-    {
-      "name": "Injir",
-      "email": "sourinjir@gmail.com"
-    }
-  ],
   "require": {
     "php": ">=7.0",
     "illuminate/support": "~5.5.0"
   },
   "require-dev": {
     "orchestra/testbench": "~3.5.0",
+    "graham-campbell/testbench": "^4.0",
+    "nunomaduro/collision": "^2.0",
+    "fzaninotto/faker": "^1.4",
+    "mockery/mockery": "^1.0",
     "phpunit/phpunit": "~6.0"
   },
   "autoload": {
-    "classmap": [
-      "src/Controllers",
-      "src/Commands",
-      "src/Models"
-    ],
     "psr-4": {
-      "Usedesk\\SyncEngineIntegration\\": "src"
+      "Usedesk\\Sync\\": "src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Usedesk\\SyncEngineIntegration\\Tests\\": "tests"
+      "Usedesk\\Sync\\Tests\\": "tests"
     },
     "files": [
       "vendor/phpunit/phpunit/src/Framework/Assert/Functions.php"
@@ -46,7 +33,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Usedesk\\SyncEngineIntegration\\ServiceProvider"
+        "Usedesk\\Sync\\ServiceProvider"
       ]
     },
     "branch-alias": {

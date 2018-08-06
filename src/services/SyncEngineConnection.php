@@ -1,6 +1,6 @@
 <?php
 
-namespace Usedesk\SyncEngineIntegration\Services;
+namespace Usedesk\Sync\Services;
 
 class SyncEngineConnection {
 

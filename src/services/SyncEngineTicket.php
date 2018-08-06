@@ -1,11 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: souri
- * Date: 05.07.2017
- * Time: 10:56
- */
-namespace Usedesk\SyncEngineIntegration\Services;
+
+namespace Usedesk\Sync\Services;
+
 use Carbon\Carbon;
 use Exception;
 

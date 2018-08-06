@@ -1,17 +1,21 @@
 <?php
-namespace Usedesk\SyncEngineIntegration\Jobs;
+
+namespace Usedesk\Sync\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Usedesk\SyncEngineIntegration\helpers\SyncEngineHelper;
+
+use Usedesk\Sync\Helpers\SyncEngineHelper;
 
 class CreateChannel implements ShouldQueue {
 
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private $helper;
+    
     private $name;
     private $email;
     private $password;
@@ -27,6 +31,7 @@ class CreateChannel implements ShouldQueue {
         $this->password = $password;
         $this->params = $params;
         $this->reauth = $reauth;
+        $this->helper = new SyncEngineHelper;
     }
 
     public function handle()
@@ -50,7 +55,7 @@ class CreateChannel implements ShouldQueue {
             $params['settings'] = $params;
         }
 
-        $result = SyncEngineHelper::createAccount($params);
+        $result = $this->helper->createAccount($params);
 
         if (!empty($result['type'])) {
             return [
