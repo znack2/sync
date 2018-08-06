@@ -1,8 +1,8 @@
 <?php
 
-namespace Usedesk\Sync\Repositories;
+namespace Usedesk\SyncIntegration\Repositories;
 
-use Usedesk\Sync\Models\VkChannel;
+use Usedesk\SyncIntegration\Models\VkChannel;
 
 use App\Jobs\Client\{FindOrCreateClient};
 use App\Jobs\Ticket\{FindOrCreateTicket};

@@ -1,6 +1,6 @@
 <?php
 
-namespace Usedesk\Sync\Http\Requests\Tickets;
+namespace Usedesk\SyncIntegration\Http\Requests\Tickets;
 
 use Illuminate\Foundation\Http\FormRequest;
 

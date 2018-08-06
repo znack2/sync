@@ -1,6 +1,6 @@
 <?php
 
-namespace Usedesk\Sync\Jobs;
+namespace Usedesk\SyncIntegration\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;
@@ -8,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-use Usedesk\Sync\Helpers\SyncEngineHelper;
+use Usedesk\SyncIntegration\Helpers\SyncEngineHelper;
 
 class CreateChannel implements ShouldQueue {
 

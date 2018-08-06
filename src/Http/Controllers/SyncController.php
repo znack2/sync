@@ -1,15 +1,15 @@
 <?php
 
-namespace Usedesk\Sync\Controllers;
+namespace Usedesk\SyncIntegration\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 
-use Usedesk\Sync\Repository\SyncRepository;
-use Usedesk\Sync\helpers\SyncEngineHelper;
-use Usedesk\Sync\Services\SyncEngineEmail;
+use Usedesk\SyncIntegration\Repository\SyncRepository;
+use Usedesk\SyncIntegration\helpers\SyncEngineHelper;
+use Usedesk\SyncIntegration\Services\SyncEngineEmail;
 
 class SyncController
 {

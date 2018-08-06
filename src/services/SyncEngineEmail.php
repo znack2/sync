@@ -1,6 +1,6 @@
 <?php
 
-namespace Usedesk\Sync\Services;
+namespace Usedesk\SyncIntegration\Services;
 
 use Carbon\Carbon;
 use Exception;

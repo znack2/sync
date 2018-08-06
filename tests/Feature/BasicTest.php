@@ -1,8 +1,8 @@
 <?php
 
-namespace Usedesk\Sync\Tests\Feature;
+namespace Usedesk\SyncIntegration\Tests\Feature;
 
-use Usedesk\Sync\Tests\TestCase;
+use Usedesk\SyncIntegration\Tests\TestCase;
 
 // use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Response;

@@ -1,5 +1,5 @@
 {
-  "name": "Usedesk/Sync",
+  "name": "Usedesk/SyncIntegration",
   "description": "A sync engine integration",
   "license": "MIT",
   "require": {
@@ -16,12 +16,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Usedesk\\Sync\\": "src"
+      "Usedesk\\SyncIntegration\\": "src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Usedesk\\Sync\\Tests\\": "tests"
+      "Usedesk\\SyncIntegration\\Tests\\": "tests"
     },
     "files": [
       "vendor/phpunit/phpunit/src/Framework/Assert/Functions.php"
@@ -33,7 +33,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Usedesk\\Sync\\ServiceProvider"
+        "Usedesk\\SyncIntegration\\ServiceProvider"
       ]
     },
     "branch-alias": {

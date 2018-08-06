@@ -1,6 +1,6 @@
 <?php
 
-namespace Usedesk\Sync;
+namespace Usedesk\SyncIntegration;
 
 use Illuminate\Support\ServiceProvider;
 
