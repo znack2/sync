@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 Route::group([
     'prefix' => config('app.version').'/syncEngine'
@@ -24,3 +24,7 @@ Route::group([
     	 'as' 	=> 'sync.accounts'
 	]);
 });
+
+
+
+
