@@ -1,5 +1,5 @@
 <?php
-namespace Usedesk\SyncEngineIntegration\Jobs;
+namespace Usedesk\SyncIntegration\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Bus\Queueable;

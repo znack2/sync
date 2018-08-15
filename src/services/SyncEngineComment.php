@@ -1,12 +1,7 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: souri
- * Date: 05.07.2017
- * Time: 10:56
- */
+<?php declare(strict_types=1);
 
-namespace Usedesk\SyncEngineIntegration\Services;
+namespace Usedesk\SyncIntegration\Services;
+
 use Carbon\Carbon;
 use Exception;
 

@@ -1,9 +1,12 @@
-<?php
-namespace Usedesk\SyncEngineIntegration\Services;
+<?php declare(strict_types=1);
+
+namespace Usedesk\SyncIntegration\Services;
+
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
 class SyncEngineEmail {
     public $ticket = null;
     public $comment = null;

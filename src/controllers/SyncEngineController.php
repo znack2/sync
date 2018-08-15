@@ -1,20 +1,22 @@
 <?php
-namespace Usedesk\SyncEngineIntegration\Controllers;
+namespace Usedesk\SyncIntegration\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
-use Usedesk\SyncEngineIntegration\helpers\SyncEngineHelper;
-use Usedesk\SyncEngineIntegration\Jobs\DeleteChannel;
-use Usedesk\SyncEngineIntegration\Services\SyncEngineEmail;
+use Usedesk\SyncIntegration\helpers\SyncEngineHelper;
+use Usedesk\SyncIntegration\Jobs\DeleteChannel;
+use Usedesk\SyncIntegration\Services\SyncEngineEmail;
 
 class SyncEngineController
 {
 
     private $addr;
+    private $syncHelper;
 
     public function __construct()
     {
-        $this->addr =  SyncEngineHelper::getAddr();
+        $this->syncHelper = new SyncEngineHelper();
+        $this->addr = $this->syncHelper->getAddr();
     }
 
     /**
@@ -23,7 +25,7 @@ class SyncEngineController
      */
     public function createChannel(Request $request){
         if($request->has('name') and $request->has('email_address') and $request->has('password')) {
-            $response = SyncEngineHelper::createAccount($request->all());
+            $response = $this->syncHelper->createAccount($request->input('email_address'), $request->input('password'));
         } else {
             $response = ['error' => 'data error'];
         }
@@ -160,7 +162,7 @@ class SyncEngineController
                     'channel_type' => 'email',
                     'channel_id' => $channel->id,
                     'from_client' => [
-                        $client_id => $attributes['from'][0]['email']
+                        $client_id => [$attributes['from'][0]['email']]
                     ]
                 ],
                 $files

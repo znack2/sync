@@ -26,20 +26,20 @@ auto discovery feature.**
 
 Add service provider to `config/app.php` in `providers` section
 ```php
-usedesk\SyncEngineIntegration\ServiceProvider::class,
+Usedesk\SyncIntegration\ServiceProvider::class,
 ```
 
 ### Register Facade
 
 Register package facade in `config/app.php` in `aliases` section
 ```php
-usedesk\SyncEngineIntegration\Facades\SyncEngineIntegration::class,
+Usedesk\SyncIntegration\Facades\SyncEngineIntegration::class,
 ```
 
 ### Publish Configuration File
 
 ```bash
-php artisan vendor:publish --provider="usedesk\SyncEngineIntegration\ServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Usedesk\SyncIntegration\ServiceProvider" --tag="config"
 ```
 
 ## Usage
