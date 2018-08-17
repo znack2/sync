@@ -61,7 +61,6 @@ class SyncEngineController
     public function createTicketFromSync($attributes) {
         try {
             $data = [];
-
             $need = ['body', 'from', 'account_id', 'thread_id', 'snippet', 'id', 'subject'];
 
             foreach ($need as $key) {
@@ -104,7 +103,6 @@ class SyncEngineController
                     }
                 }
             }
-
             $channel = $this->getChannel($attributes['to'][0]['email']);
 
             $name = $attributes['from'][0]['name'] ?? '';
@@ -120,7 +118,6 @@ class SyncEngineController
                     'last_name' => $name[1] ?? '',
                 ]
             ));
-
             if (dispatch_now(new \App\Jobs\Ticket\CheckDouble($channel->company_id, $client_id, $data['subject'], $data['date']))) {
                 return false;
             }
@@ -161,9 +158,13 @@ class SyncEngineController
 
                     'channel_type' => 'email',
                     'channel_id' => $channel->id,
-                    'from_client' => [
-                        $client_id => [$attributes['from'][0]['email']]
-                    ]
+                    'client' => [
+                        'contact' => [
+                            'emails' => [
+                                $attributes['from'][0]['email']
+                            ]
+                        ]
+                    ],
                 ],
                 $files
                 ));
