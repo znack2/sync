@@ -8,7 +8,7 @@ class SyncEngineHelper {
 
     public function __construct()
     {
-        $this->service = env('SYC_ENGINE_HOST', 'localhost');
+        $this->service = env('SYC_ENGINE_HOST', 'localhost') . ':5555';
     }
 
     public function getAddr()
