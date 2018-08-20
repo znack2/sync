@@ -156,8 +156,10 @@ class SyncEngineController
                     'has_file' => !empty($files),
                     'all_data' => $data,
 
-                    'channel_type' => 'email',
-                    'channel_id' => $channel->id,
+                    'channel' => [
+                        'channel_type' => 'email',
+                        'channel_id' => $channel->id,
+                    ],
                     'client' => [
                         'contact' => [
                             'emails' => [
