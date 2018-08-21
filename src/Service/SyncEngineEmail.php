@@ -7,7 +7,8 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class SyncEngineEmail {
+class SyncEngineEmail 
+{
     public $ticket = null;
     public $comment = null;
     public $channel = null;
@@ -39,7 +40,7 @@ class SyncEngineEmail {
         $this->setCompanyId($channel->company_id);
         if(!$this->checkSyncMessage()){
             $this->is_outgoing = $this->checkOutgoing();
-        }
+        } 
         $this->client = $this->getClient();
         $ticket_id = $this->checkThread();
         if($ticket_id){

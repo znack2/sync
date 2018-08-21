@@ -5,28 +5,33 @@ namespace Usedesk\SyncIntegration\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
-use Usedesk\SyncIntegration\helpers\SyncEngineHelper;
-use Usedesk\SyncIntegration\Jobs\DeleteChannel;
+use Usedesk\SyncIntegration\Services\SyncEngineService;
 use Usedesk\SyncIntegration\Services\SyncEngineEmail;
 
-class SyncEngineController
-{
 
+use App\Jobs\Client\{FindOrCreateClient};
+use App\Jobs\Ticket\{FindOrCreateTicket,CheckDouble};
+use App\Jobs\Comment\{AddComment};
+
+class SyncController
+{
     private $addr;
-    private $syncHelper;
+    private $service;
 
     public function __construct()
     {
-        $this->syncHelper = new SyncEngineHelper();
-        $this->addr = $this->syncHelper->getAddr();
+        $this->service = new SyncEngineService();
+        $this->addr = $this->service->getAddr();
     }
 
-    /**
+	 /**
      * @param Request $request
      * @return string
      */
-    public function syncEngine(Request $request){
+    public function syncEngine(Request $request)
+    {
         $input = $request->all();
+
         foreach($input as $item){
             $object = $item['object'] ?? null;
             $event = $item['event'] ?? null;
@@ -45,8 +50,8 @@ class SyncEngineController
      * @param $attributes
      * @return bool
      */
-    public function createTicketFromSync($attributes) {
-        try {
+    public function createTicketFromSync($attributes) 
+    {
             $data = [];
             $need = ['body', 'from', 'account_id', 'thread_id', 'snippet', 'id', 'subject'];
 
@@ -95,27 +100,32 @@ class SyncEngineController
             $name = $attributes['from'][0]['name'] ?? '';
             $name = explode(' ', $name);
 
-            $client_id = dispatch_now(new \App\Jobs\Client\FindOrCreateClient(
+            $params = [
+	            'email' => $attributes['from'][0]['email'],
+	            'client' => ['company_id' => $channel->company_id],
+	            'first_name' => !empty($name[0]) ? $name[0] : $attributes['from'][0]['email'],
+	            'last_name' => $name[1] ?? '',
+	        ];
+
+            $client_id = dispatch_now(new FindOrCreateClient(
                 $channel->company_id,
                 'email',
-                [
-                    'email' => $attributes['from'][0]['email'],
-                    'client' => ['company_id' => $channel->company_id],
-                    'first_name' => !empty($name[0]) ? $name[0] : $attributes['from'][0]['email'],
-                    'last_name' => $name[1] ?? '',
-                ]
+                $params
             ));
-            if (dispatch_now(new \App\Jobs\Ticket\CheckDouble($channel->company_id, $client_id, $data['subject'], $data['date']))) {
+
+            if (dispatch_now(new CheckDouble($channel->company_id, $client_id, $data['subject'], $data['date']))) {
                 return false;
             }
 
+            $owner = [ //owner
+	            'type' => 'App\Models\Client\Client', //owner
+	            'id' => $client_id,
+	        ];
+
             if (!$ticket_id = $this->findTicketById($attributes['body'], $attributes['thread_id'])) {
-                $ticket = dispatch_now(new \App\Jobs\Ticket\FindOrCreateTicket(
+                $ticket = dispatch_now(new FindOrCreateTicket(
                     $channel->company_id,
-                    [ //owner
-                        'type' => 'App\Models\Client\Client', //owner
-                        'id' => $client_id,
-                    ],
+                    $owner,
                     $channel->id,
                     'email', //channel type
                     $attributes['thread_id'],
@@ -126,60 +136,42 @@ class SyncEngineController
                 $ticket_id = $ticket->id;
             }
 
+            $requestData = [ 
+	            'user_type' => 'client',
+	            'message_type' => 'public',
+	            'message' => $attributes['body'],
+	            'subject' => $attributes['subject'],
+	            'is_html' => true,
+	            'has_file' => !empty($files),
+	            'all_data' => $data,
+
+	            'channel_type' => 'email',
+	            'channel_id' => $channel->id,
+	            'from_client' => [
+	                $client_id => $attributes['from'][0]['email']
+	            ]
+	        ];
+
             dispatch(new \App\Jobs\Comment\AddComment(
                 $channel->company_id,
                 $ticket_id,
-                0, //user_id
-                [
-                    'type' => 'App\Models\Client\Client', //owner
-                    'id' => $client_id,
-                ],
-                [ //request data
-                    'user_type' => 'client',
-                    'message_type' => 'public',
-                    'message' => $attributes['body'],
-                    'subject' => $attributes['subject'],
-                    'is_html' => true,
-                    'has_file' => !empty($files),
-                    'all_data' => $data,
-
-                    'channel' => [
-                        'channel_type' => 'email',
-                        'channel_id' => $channel->id,
-                    ],
-                    'client' => [
-                        'contact' => [
-                            'emails' => [
-                                $attributes['from'][0]['email']
-                            ]
-                        ]
-                    ],
-                ],
+                $user_id = 0,
+                $owner,
+   				$requestData,
                 $files
-                ));
-        }
-        catch(\Exception $e){
-            Log::alert($e);
-            return false;
+            ));
         }
     }
 
-
-
-    /**
-     * @param $email
-     * @return mixed
-     * @throws \Exception
-     */
     protected function getChannel($email)
-    {
-            $channel = DB::table('email_channels')->where('incoming_email', $email)->first();
+	{
+        $channel = DB::table('email_channels')->where('incoming_email', $email)->first();
 
-            if (!$channel) {
-                throw new \Exception('Channel not found - ' . $email);
-            }
+        if (!$channel) {
+            throw new \Exception('Channel not found - ' . $email);
+        }
 
-            return $channel;
+        return $channel;
     }
 
     protected function findTicketById($message, $thread_id)
