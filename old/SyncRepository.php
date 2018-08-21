@@ -155,8 +155,5 @@ class SyncRepository
     }
 
 
-    public function getAccounts()
-    {
-        return json_decode(file_get_contents($this->syncService . '/accounts'));
-    }
+
 }

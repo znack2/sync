@@ -1,26 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace Usedesk\SyncIntegration\Helpers;
+namespace Usedesk\SyncIntegration\Service;
 
-class SyncEngineHelper {
+class SyncEngineService {
 
-    private $service;
-
-    public function __construct()
-    {
-        $this->service = env('SYC_ENGINE_HOST', 'localhost') . ':5555';
-    }
-
-    public function getAddr()
-    {
-        return $this->service;
-    }
+    private $url = env('SYC_ENGINE_HOST', 'localhost') . ':5555';
 
     public function createAccount(string $email, string $password)
     {
         $params = [
-            'email'=>$email,
-            'password'=>$password
+            'email'     =>$email,
+            'password'. =>$password
         ];
 
         $context = stream_context_create([
@@ -32,16 +22,10 @@ class SyncEngineHelper {
             ],
         ]);
 
-        $path = 'http://' . $this->service . '/connect/authorize';
+        $path = 'http://' . $this->url . '/connect/authorize';
 
         $response = file_get_contents($path, false, $context);
 
         return json_decode($response, true);
     }
-
-    public function deleteAccount(string $account_id)
-    {
-
-    }
-
 }

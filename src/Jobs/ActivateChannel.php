@@ -7,28 +7,27 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-
 use Usedesk\SyncIntegration\Service\SyncEngineService;
 
-class CreateChannel implements ShouldQueue {
-
+class ActivateChannel implements ShouldQueue
+{
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $helper;
-    
-    private $params;
-    private $data;
+	private $helper;
 
-    public function __construct(array $params = [],array $data = [])
+    protected $params;
+    protected $data;
+
+    public function __construct(array $params, array $data)
     {
         $this->params = $params;
         $this->data = $data;
         $this->helper = new SyncEngineService;
     }
 
-    public function handle(): JsonResponse
+    public function handle()
     {
-        $params = [
+		$params = [
             'imap_host'         => $request->input('params.imap.host'),
             'imap_port'         => $request->input('params.imap.port', 993),
             'imap_username'     => $request->input('params.imap.username',  $request->input('incoming_email')),
@@ -63,53 +62,7 @@ class CreateChannel implements ShouldQueue {
             if (isset($result['type']) and $result['type'] == 'api_error' and !empty($result['message']) and $result['message'] == 'Already have this account!') {
         }
 
-        $this->helper->createAccount($params);
-
-        $response['message'] = 'success';// ->header('Content-Type', 'application/json');
-
-        return $this->sendResponse($response);
-
-
-
-
-           // if (isset($result['type']) and $result['type'] == 'oauth') {
-           //      return $this->helper->sendResponse($result);
-           //  }
-
-            // if (isset($result['type']) and $result['type'] == 'oauth') {
-            //         return $this->helper->sendResponse($result);
-            //     }
-
-            //     if (!$result['success']) {
-            //         return $this->helper->sendError($result);
-            //     }
-            //     $reauth_done = true;
-            // }
-            // if (!$reauth_done) {
-            //     return $this->helper->sendError($result);
-            // }
-
-        // if (!empty($result['type'])) {
-        //     return [
-        //         'success' => false,
-        //         'type' => $result['type'],
-        //         'message' => $result['message'],
-        //     ];
-        // }
-
-        // if (!empty($result['oauth2_url'])) {
-        //     return [
-        //         'success' => false,
-        //         'type' => 'oauth',
-        //         'oauth2_url' => $result['oauth2_url'],
-        //     ];
-        // }
-
-        // return [
-        //     'success' => true,
-        //     'type' => 'success',
-        //     'data' => $result,
-        // ];
+        return $this->helper->checkAccount($params);
     }
 
 }

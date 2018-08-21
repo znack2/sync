@@ -1,5 +1,7 @@
 <?php
+
 namespace Usedesk\SyncIntegration\Controllers;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -17,21 +19,6 @@ class SyncEngineController
     {
         $this->syncHelper = new SyncEngineHelper();
         $this->addr = $this->syncHelper->getAddr();
-    }
-
-    /**
-     * @param Request $request
-     * @return mixed
-     */
-    public function createChannel(Request $request){
-        if($request->has('name') and $request->has('email_address') and $request->has('password')) {
-            $response = $this->syncHelper->createAccount($request->input('email_address'), $request->input('password'));
-        } else {
-            $response = ['error' => 'data error'];
-        }
-
-        return response(json_encode($response), 200)
-            ->header('Content-Type', 'application/json');
     }
 
     /**
@@ -177,21 +164,7 @@ class SyncEngineController
         }
     }
 
-    public function deleteChannel(Request $request)
-    {
 
-        dispatch(new DeleteChannel($request->input('channel_id')));
-
-        return response([
-            'success' => true,
-            'message' => 'channel deleted succeesfully',
-        ]);
-    }
-
-    public function accounts()
-    {
-        return json_decode(file_get_contents($this->addr . '/accounts'));
-    }
 
     /**
      * @param $email

@@ -13,7 +13,7 @@ class SyncServiceProvider extends ServiceProvider
         $this->publishes([
             self::CONFIG_PATH => config_path('sync_integration.php'),
         ], 'config');
-        $this->loadRoutesFrom(__DIR__.'/routes/web.php');
+        // $this->loadRoutesFrom(__DIR__.'/routes/web.php');
     }
 
     public function register()
@@ -22,11 +22,5 @@ class SyncServiceProvider extends ServiceProvider
             self::CONFIG_PATH,
             'sync_integration'
         );
-
-        $this->registerCommand();
-    }
-    protected function registerCommand()
-    {
-
     }
 }
