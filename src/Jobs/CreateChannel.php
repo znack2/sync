@@ -113,3 +113,67 @@ class CreateChannel implements ShouldQueue {
     }
 
 }
+
+
+
+
+
+// if ($request->has('incoming_main_email')) {
+//             $request->merge(['incoming_email' => $request->input('incoming_main_email')]);
+//         }
+
+        
+//         $extra = [];
+
+//         if (isset($requestData['quotes'])) {
+//             $extra['quotes'] = $requestData['quotes'];
+//             unset($requestData['quotes']);
+//         }
+
+//         if (isset($requestData['csi'])) {
+//             $extra['csi'] = $requestData['csi'];
+//             unset($requestData['csi']);
+//         }
+
+//         if ($extra) {
+//             $requestData['extra_email'] = json_encode($extra);
+//         }
+
+//         if ($requestData['incoming_connection'] == 'external') {
+//             $result = dispatch_now(new CreateChannel(
+//                 $request->input('name'),
+//                 $request->input('incoming_email'),
+//                 $request->input('params.imap.password'),
+//                 $syncEngineParams,
+//                 false
+//             ));
+
+//             $reauth_done = false;
+//             if (!$result['success']) {
+//                 if (isset($result['type']) and $result['type'] == 'oauth') {
+//                     return $this->helper->sendResponse($result);
+//                 }
+
+//                 if (isset($result['type']) and $result['type'] == 'api_error' and !empty($result['message']) and $result['message'] == 'Already have this account!') {
+//                     $result = dispatch_now(new CreateChannel(
+//                         $request->input('name'),
+//                         $request->input('incoming_email'),
+//                         $request->input('params.imap.password'),
+//                         $syncEngineParams,
+//                         true
+//                     ));
+
+//                     if (isset($result['type']) and $result['type'] == 'oauth') {
+//                         return $this->helper->sendResponse($result);
+//                     }
+
+//                     if (!$result['success']) {
+//                         return $this->helper->sendError($result);
+//                     }
+//                     $reauth_done = true;
+//                 }
+//                 if (!$reauth_done) {
+//                     return $this->helper->sendError($result);
+//                 }
+//             }
+//         }
