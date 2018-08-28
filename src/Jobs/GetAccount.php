@@ -2,19 +2,14 @@
 
 namespace Usedesk\SyncIntegration\Jobs;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-
 use Usedesk\SyncIntegration\Service\SyncEngineService;
+use Usedesk\SyncIntegration\Resources\AccountCollection;
 
-class GetAccounts implements ShouldQueue
+use App\Jobs\AbstractJob;
+
+class GetAccounts extends AbstractJob
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-	private $helper;
+	private $service;
 
     protected $params;
     protected $data;
@@ -23,14 +18,17 @@ class GetAccounts implements ShouldQueue
     {
         $this->params = $params;
         $this->data = $data;
-        $this->helper = new SyncEngineService;
+        $this->service = new SyncEngineService;
     }
 
-    public function getAccounts()
+    public function getAccounts(): JsonResponse
     {
-        $result = json_decode(file_get_contents($this->syncService . '/accounts'));
+        // $company_id = $this->currentCompany_id;
+        // // json_decode(file_get_contents($this->syncService . '/accounts'));
 
-        // return new AccountCollection($result);
+        // $accounts = $this->service->getAccounts($company_id);
+
+        // return new AccountCollection($accounts,$this->admin);
     }
 }
     

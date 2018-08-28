@@ -6,38 +6,23 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
-use Usedesk\SyncIntegration\Services\SyncEngineService;
-use Usedesk\SyncIntegration\Services\SyncEngineEmail;
-
-
 use App\Jobs\Client\{FindOrCreateClient};
 use App\Jobs\Ticket\{FindOrCreateTicket};//CheckDouble
 use App\Jobs\Comment\{AddComment};
 
 class SyncController
 {
-    private $service;
-
-    public function __construct()
-    {
-        $this->service = new SyncEngineService();
-    }
-
 	 /**
-     * @param Request $request
-     * @return string
      */
-    public function create(Request $request)
+    public function create(Request $request): string
     {
-        $input = $request->all();
+        $requestData = $request->all();
 
-        foreach($input as $item)
+        foreach($requestData as $item)
         {
             $data = prepare($item['attributes']);
 
             $data['date'] = $this->setDate($item['attributes']['date']);
-
-
 
             $channel = $this->setChannel($item['attributes']['to'][0]['email']);
             
@@ -45,11 +30,23 @@ class SyncController
 
             $files = $this->setFiles($item['attributes']['files']);
 
-            $ticket = $this->setTicket($company_id,$thread_id,$channel_id,$item['attributes'],$owner);
+            $ticket = $this->setTicket(
+                $company_id,
+                $thread_id,
+                $channel_id,
+                $item['attributes'],
+                $owner
+            );
 
-
-            $this->sendComment($company_id,$ticket,$client,$channel,$from,$data,$files);
-
+            $this->sendComment(
+                $company_id,
+                $ticket,
+                $client,
+                $channel,
+                $from,
+                $data,
+                $files
+            );
 
             dispatch(new AddTicketContact(
                  $company_id,
@@ -206,10 +203,10 @@ class SyncController
         preg_match('/\<span ticket_id="([0-9]+)">/i', $attributes['body'], $matches);
 
         //TODO: remove repository
-        if ($matches) {
-            DB::table('tickets')->where('id', $matches[1])->update(['thread_id' => $attributes['thread_id']]);
-            return $matches[1];
-        }
+        // if ($matches) {
+        //     DB::table('tickets')->where('id', $matches[1])->update(['thread_id' => $attributes['thread_id']]);
+        //     return $matches[1];
+        // }
 
         $ticket = dispatch_now(new FindOrCreateTicket(
             $company_id,

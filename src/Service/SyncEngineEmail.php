@@ -33,7 +33,7 @@ class SyncEngineEmail
         $this->setChannel($channel);
         $this->setCompanyId($channel->company_id);
         if(!$this->checkSyncMessage()){
-            $this->is_outgoing = $this->checkOutgoing();
+            $this->is_outgoing = ($this->from_email == $this->channel->imap_username);
         } 
         $this->client = $this->getClient();
         $ticket_id = $this->checkThread();
@@ -69,6 +69,8 @@ class SyncEngineEmail
     //     }
     //     return 0;
     // }
+
+    
     // protected function checkSyncMessage(){
     //     $message_id = $this->getSyncEngineId();
     //     $sync_comment = DB::table('sync_engine_ticket_comments')->where('sync_engine_id', $message_id)->first();
@@ -85,12 +87,6 @@ class SyncEngineEmail
     //     }
     //     return 0;
     // }
-    protected function checkOutgoing(){
-        if ($this->from_email == $this->channel->imap_username) {
-            return true;
-        }
-        return false;
-    }
 
     protected function getClient(){
         $company_id = $this->getCompanyId();
@@ -165,7 +161,6 @@ class SyncEngineEmail
     {
         $sync_ticket = $this->setTicket($params);
 
-
         $sync_ticket->setChannel(\Ticket::CHANNEL_EMAIL);
         $sync_ticket->setAdditionalId('sync');
         $sync_ticket->setStatusId(\TicketStatus::getByKey(\TicketStatus::SYSTEM_NEW)->id);
@@ -212,10 +207,10 @@ class SyncEngineEmail
         $job = new \App\Jobs\Ticket\CreateSyncTicket($ticketData);
         return dispatch_now($job);
     }
-    protected function getUsedeskTicket(){
-        $ticket =\Ticket::where('id',$this->ticket->getTicketId())->first();
-        return $ticket;
-    }
+    // protected function getUsedeskTicket(){
+    //     $ticket =\Ticket::where('id',$this->ticket->getTicketId())->first();
+    //     return $ticket;
+    // }
     protected function createSyncComment($data)
     {
         $sync_comment = [
@@ -268,8 +263,11 @@ class SyncEngineEmail
         $ticketComment->save();
         return $ticketComment;
     }
-    protected function saveCommentFile(){
+
+    protected function saveCommentFile()
+    {
         $files = $this->comment->getFiles();
+
         if ($files) {
             foreach ($files as $file) {
                 if (isset($file['id'])) {

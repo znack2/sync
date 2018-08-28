@@ -2,19 +2,12 @@
 
 namespace Usedesk\SyncIntegration\Jobs;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-
 use Usedesk\SyncIntegration\Service\SyncEngineService;
 
-class DeleteChannel implements ShouldQueue
+use App\Jobs\AbstractJob;
+
+class DeleteChannel extends AbstractJob
 {
-
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
     protected $channel_id;
 
     public function __construct(string $channel_id)
@@ -22,11 +15,9 @@ class DeleteChannel implements ShouldQueue
         $this->channel_id = $channel_id;
     }
 
-    public function handle()
+    public function handle(): JsonResponse
     {
-        return response([
-            'success' => true,
-            'message' => 'channel deleted succeesfully',
+
     }
 
 }
