@@ -5,36 +5,30 @@ namespace Usedesk\SyncIntegration\Services;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Log;
 
 class SyncEngineEmail 
 {
-    public $ticket = null;
-    public $comment = null;
-    public $channel = null;
-    public $is_new_ticket = true;
-    public $is_outgoing = false;
-    public $client = null;
-    public $thread_exist = false;
-    public $messages_ids = [];
-    public $reply_to = null;
-    public $folderName = null;
-    public $folderDisplayName = null;
-    protected $to = null;
-    protected $from_email = '';
-    protected $from_name = '';
-    protected $company_id = null;
-    protected $thread_id = null;
-    protected $sync_engine_id = null;
-    protected $account_id = null;
-
     public function __construct($params,$channel)
     {
         if(is_array($params)){
-            $this->fillFromArray($params);
-        }
-        else{
-            $this->fill($params);
+            isset($params->account_id) && $this->setAccountId($params->account_id);
+            isset($params->id) && $this->setSyncEngineId($params->id);
+            isset($params->thread_id) && $this->setThreadId($params->thread_id);
+            if(isset($params->message_ids)){
+                $this->messages_ids = $params->message_ids;
+            }
+            if (isset($params->from) && isset($params->from[0])) {
+                $this->setFromEmail($params->from[0]['email']);
+                $this->setFromName($params->from[0]['name']);
+            }
+            isset($params->to) && $this->setTo($params->to);
+            if(isset($params->folder_name)){
+                $this->folderName = $params->folder_name;
+            }
+            if(isset($params->folder_display_name)){
+                $this->folderDisplayName = $params->folder_display_name;
+            }
         }
         $this->setChannel($channel);
         $this->setCompanyId($channel->company_id);
@@ -45,13 +39,13 @@ class SyncEngineEmail
         $ticket_id = $this->checkThread();
         if($ticket_id){
             $this->is_new_ticket = false;
-            $this->ticket = new SyncEngineTicket($params, $ticket_id);
+            $this->ticket = $this->setTicket($params, $ticket_id);
             $this->thread_exist = true;
         }
         else{
-            $this->ticket = new SyncEngineTicket($params);
+            $this->ticket = $this->setTicket($params);
         }
-//    $this->comment = $this->createSyncComment($params);
+        //    $this->comment = $this->createSyncComment($params);
         $date = Carbon::now();
         if (isset($params['date'])) {
             if(isset($params['date']['$date'])){
@@ -64,72 +58,33 @@ class SyncEngineEmail
         }
         $this->ticket->setLastUpdatedAt($date);
         $this->ticket->setPublishedAt($date);
-//    $this->comment->setPublishedAt($date);
+        //    $this->comment->setPublishedAt($date);
     }
-    protected function fillFromArray($params){
-        isset($params['account_id']) && $this->setAccountId($params['account_id']);
-        isset($params['id']) && $this->setSyncEngineId($params['id']);
-        isset($params['thread_id']) && $this->setThreadId($params['thread_id']);
-        if(isset($params['message_ids'])){
-            $this->messages_ids = $params['message_ids'];
-        }
-        if (isset($params['from']) && isset($params['from'][0])) {
-            $this->setFromEmail($params['from'][0]['email']);
-            $this->setFromName($params['from'][0]['name']);
-        }
-        isset($params['to']) && $this->setTo($params['to']);
-
-        if(isset($params['folder_name'])){
-            $this->folderName = $params['folder_name'];
-        }
-        if(isset($params['folder_display_name'])){
-            $this->folderDisplayName = $params['folder_display_name'];
-        }
-
-    }
-    protected function fill($params){
-        isset($params->account_id) && $this->setAccountId($params->account_id);
-        isset($params->id) && $this->setSyncEngineId($params->id);
-        isset($params->thread_id) && $this->setThreadId($params->thread_id);
-        if(isset($params->message_ids)){
-            $this->messages_ids = $params->message_ids;
-        }
-        if (isset($params->from) && isset($params->from[0])) {
-            $this->setFromEmail($params->from[0]['email']);
-            $this->setFromName($params->from[0]['name']);
-        }
-        isset($params->to) && $this->setTo($params->to);
-        if(isset($params->folder_name)){
-            $this->folderName = $params->folder_name;
-        }
-        if(isset($params->folder_display_name)){
-            $this->folderDisplayName = $params->folder_display_name;
-        }
-    }
-    protected function checkThread(){
-        $thread_id = $this->getThreadId();
-        $thread =  DB::table('sync_engine_tickets')->where('thread_id', $thread_id)->first();
-        if($thread){
-            return $thread->ticket_id;
-        }
-        return 0;
-    }
-    protected function checkSyncMessage(){
-        $message_id = $this->getSyncEngineId();
-        $sync_comment = DB::table('sync_engine_ticket_comments')->where('sync_engine_id', $message_id)->first();
-        if($sync_comment){
-            return $sync_comment->comment_id;
-        }
-        return 0;
-    }
-    protected function checkSyncMessageById($id){
-        $message_id = $id;
-        $sync_comment = DB::table('sync_engine_ticket_comments')->where('sync_engine_id', $message_id)->first();
-        if($sync_comment){
-            return $sync_comment->comment_id;
-        }
-        return 0;
-    }
+    
+    // protected function checkThread(){
+    //     $thread_id = $this->getThreadId();
+    //     $thread =  DB::table('sync_engine_tickets')->where('thread_id', $thread_id)->first();
+    //     if($thread){
+    //         return $thread->ticket_id;
+    //     }
+    //     return 0;
+    // }
+    // protected function checkSyncMessage(){
+    //     $message_id = $this->getSyncEngineId();
+    //     $sync_comment = DB::table('sync_engine_ticket_comments')->where('sync_engine_id', $message_id)->first();
+    //     if($sync_comment){
+    //         return $sync_comment->comment_id;
+    //     }
+    //     return 0;
+    // }
+    // protected function checkSyncMessageById($id){
+    //     $message_id = $id;
+    //     $sync_comment = DB::table('sync_engine_ticket_comments')->where('sync_engine_id', $message_id)->first();
+    //     if($sync_comment){
+    //         return $sync_comment->comment_id;
+    //     }
+    //     return 0;
+    // }
     protected function checkOutgoing(){
         if ($this->from_email == $this->channel->imap_username) {
             return true;
@@ -151,34 +106,34 @@ class SyncEngineEmail
             }
         }
         $client = null;
-//    $client = \Client::select('clients.id')
-//        ->join('client_emails', 'client_emails.client_id', '=', 'clients.id')
-//        ->where('clients.company_id', '=', $company_id)
-//        ->where('client_emails.email', $from_email)
-//        ->first();
-//    //создание клиента если его нет
-//    if (!$client) {
-//        $client = \Client::create(['name' => (empty($from_email)) ? $from_email : $from_name, 'company_id' => $company_id]);
-//        \ClientEmail::create(['email' => $from_email, 'client_id' => $client->id]);
-//    }
+            //    $client = \Client::select('clients.id')
+            //        ->join('client_emails', 'client_emails.client_id', '=', 'clients.id')
+            //        ->where('clients.company_id', '=', $company_id)
+            //        ->where('client_emails.email', $from_email)
+            //        ->first();
+            //    //создание клиента если его нет
+            //    if (!$client) {
+            //        $client = \Client::create(['name' => (empty($from_email)) ? $from_email : $from_name, 'company_id' => $company_id]);
+            //        \ClientEmail::create(['email' => $from_email, 'client_id' => $client->id]);
+            //    }
         return $client;
     }
 
-    protected function createThread(){
-        $id = DB::table('sync_engine_tickets')->insertGetid([
-            'ticket_id' => $this->ticket->getTicketId(),
-            'thread_id' => $this->getThreadId()
-        ]);
-        return $id;
-    }
+    // protected function createThread(){
+    //     $id = DB::table('sync_engine_tickets')->insertGetid([
+    //         'ticket_id' => $this->ticket->getTicketId(),
+    //         'thread_id' => $this->getThreadId()
+    //     ]);
+    //     return $id;
+    // }
 
-    protected function createSaveSyncMessageId($ticket,$comment){
-        DB::table('sync_engine_ticket_comments')->insert([
-            'ticket_id' => $ticket->id,
-            'comment_id' => $comment->id,
-            'sync_engine_id' => $this->getSyncEngineId()
-        ]);
-    }
+    // protected function createSaveSyncMessageId($ticket,$comment){
+    //     DB::table('sync_engine_ticket_comments')->insert([
+    //         'ticket_id' => $ticket->id,
+    //         'comment_id' => $comment->id,
+    //         'sync_engine_id' => $this->getSyncEngineId()
+    //     ]);
+    // }
 
     protected function SaveCopy(){
         $to = $this->comment->getTo();
@@ -206,8 +161,11 @@ class SyncEngineEmail
             }
         }
     }
-    protected function createSyncTicket($params,$ticket_id = 0){
-        $sync_ticket = new SyncEngineTicket($params);
+    protected function createSyncTicket($params,$ticket_id = 0)
+    {
+        $sync_ticket = $this->setTicket($params);
+
+
         $sync_ticket->setChannel(\Ticket::CHANNEL_EMAIL);
         $sync_ticket->setAdditionalId('sync');
         $sync_ticket->setStatusId(\TicketStatus::getByKey(\TicketStatus::SYSTEM_NEW)->id);
@@ -258,8 +216,23 @@ class SyncEngineEmail
         $ticket =\Ticket::where('id',$this->ticket->getTicketId())->first();
         return $ticket;
     }
-    protected function createSyncComment($params){
-        $sync_comment = new SyncEngineComment($params);
+    protected function createSyncComment($data)
+    {
+        $sync_comment = [
+            'message'   => $data['body'],
+            'from'      => $data['from'],
+            'client_id' => $data['client_id'],
+            'trigger_id'=> $data['trigger_id'],
+            'user_id'   => $data['user_id'],
+            'ticket_id' => $data['ticket_id'],
+            'type_id'   => $data['type_id'],
+            'comment_id'=> $data['comment_id'],
+            'to'        => $data['to'],
+            'cc'        => $data['cc'],
+            'bcc'       => $data['bcc'],
+            'files'     => $data['files'],
+        ];
+
         $sync_comment->setType('public');
         $sync_comment->setTicketId($this->ticket->getTicketId());
         if (!$this->is_outgoing && isset($this->client)) {
@@ -316,11 +289,11 @@ class SyncEngineEmail
         }
     }
 
-    public function updateTicketStatus($status){
-        DB::table('ticket')->where('id',$this->ticket->getTicketId())->update([
-            'status_id'=>$status
-        ]);
-    }
+    // public function updateTicketStatus($status){
+    //     DB::table('ticket')->where('id',$this->ticket->getTicketId())->update([
+    //         'status_id'=>$status
+    //     ]);
+    // }
 
     public function saveEmail(){
         if($this->checkSyncMessage()){
@@ -354,7 +327,7 @@ class SyncEngineEmail
         else{
             $ticket = $this->getUsedeskTicket();
             if($ticket){
-//              $ticket->status_id =  \TicketStatus::getByKey(\TicketStatus::SYSTEM_OPENED)->id;
+        //              $ticket->status_id =  \TicketStatus::getByKey(\TicketStatus::SYSTEM_OPENED)->id;
                 $ticket->status_id =  1;
             }
         }
@@ -376,88 +349,44 @@ class SyncEngineEmail
             'comment'=> $comment
         ];
     }
-    public function getTicket()
-    {
-        return $this->ticket;
-    }
-    public function setTicket($val)
-    {
-        $this->ticket = $val;
-    }
-    public function getComment()
-    {
-        return $this->comment;
-    }
-    public function setComment($val)
-    {
-        $this->comment = $val;
-    }
-    public function getFromEmail()
-    {
-        return $this->from_email;
-    }
-    public function setFromEmail($val)
-    {
-        $this->from_email = $val;
-    }
-    public function getFromName()
-    {
-        return $this->from_name;
-    }
-    public function setFromName($val)
-    {
-        $this->from_name = $val;
-    }
-    public function getChannel()
-    {
-        return $this->channel;
-    }
-    public function setChannel($val)
-    {
-        $this->channel = $val;
-    }
 
-    public function getCompanyId()
-    {
-        return $this->company_id;
-    }
-    public function setCompanyId($val)
-    {
-        $this->company_id = $val;
-    }
 
-    public function getThreadId()
-    {
-        return $this->thread_id;
-    }
-    public function setThreadId($val)
-    {
-        $this->thread_id = $val;
-    }
 
-    public function getSyncEngineId()
-    {
-        return $this->sync_engine_id;
-    }
-    public function setSyncEngineId($val)
-    {
-        $this->sync_engine_id = $val;
-    }
-    public function getAccountId()
-    {
-        return $this->account_id;
-    }
-    public function setAccountId($val)
-    {
-        $this->account_id = $val;
-    }
-    public function getTo()
-    {
-        return $this->to;
-    }
-    public function setTo($val)
-    {
-        $this->to = $val;
-    }
 
+
+
+
+
+
+    public function setTicket($params, int $ticket_id = 0)
+    {
+        // $this->setAdditionalId('sync');
+
+        $channel = [
+            'channel_type'  => 'email',
+            'channel_id'    => $params['channel_id'],
+        ];
+
+        $ticketData = [
+            'company_id'    => $this->company_id,
+            'status_id'     => 1,
+            'priority_id'   => 1,//medium
+            'type_id'       => 1,//question
+            'subject'       => $params['subject'],
+            'ticket_id'     => $ticket_id,
+        ];
+        
+            // $files = 
+            // $channelData = 
+            // $commentData = 
+
+            // $owner   = $this->getOwner($ownerData);
+            // $clients = $this->getClient($company_id,$channelData, $clientData);
+
+            // isset($data->email_channel_subject) && $this->setChannelSubject($data->email_channel_subject);
+            // isset($data->email_channel_email) && $this->setChannelEmail($data->email_channel_email);
+            // isset($data->last_updated_at) && $this->setLastUpdatedAt($data->last_updated_at);
+            // isset($data->published_at) && $this->setPublishedAt($data->published_at);
+            // isset($data->email_channel_id) && $this->setEmailChannelId($data->email_channel_id);
+    }
 }

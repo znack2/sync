@@ -10,17 +10,13 @@ class SyncServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->publishes([
-            self::CONFIG_PATH => config_path('sync_integration.php'),
-        ], 'config');
+        $this->publishes([self::CONFIG_PATH => config_path('sync_integration.php'),], 'config');
+        
         $this->loadRoutesFrom(__DIR__.'/routes/web.php');
     }
 
     public function register()
     {
-        $this->mergeConfigFrom(
-            self::CONFIG_PATH,
-            'sync_integration'
-        );
+        $this->mergeConfigFrom(self::CONFIG_PATH,'sync_integration');
     }
 }

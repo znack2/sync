@@ -5,6 +5,7 @@ namespace Usedesk\SyncIntegration\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+
 use Usedesk\SyncIntegration\Services\SyncEngineService;
 use Usedesk\SyncIntegration\Services\SyncEngineEmail;
 
@@ -26,7 +27,7 @@ class SyncController
      * @param Request $request
      * @return string
      */
-    public function syncEngine(Request $request)
+    public function create(Request $request)
     {
         $input = $request->all();
 
