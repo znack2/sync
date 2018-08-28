@@ -30,30 +30,32 @@ class SyncController
     {
         $input = $request->all();
 
-        foreach($input as $item){
-            $object = $item['object'] ?? null;
-            $event = $item['event'] ?? null;
-
-            if ($object != 'message' or $event != 'create') {
-                continue;
-            }
-
+        foreach($input as $item)
+        {
             $data = prepare($item['attributes']);
 
             $data['date'] = $this->setDate($item['attributes']['date']);
 
-            $files = $this->setFiles($item['attributes']['files']);
+
 
             $channel = $this->setChannel($item['attributes']['to'][0]['email']);
+            
+            $client = $this->setClient($item['attributes']['from'],$channel->company_id);
 
-            $owner = [ 
-                'type' => 'App\Models\Client\Client', 
-                'id'   => $this->setClient($item['attributes']['from'],$channel->company_id);
-            ];
+            $files = $this->setFiles($item['attributes']['files']);
 
-            $this->setTicket($company_id,$thread_id,$channel_id,$item['attributes'],$owner);
+            $ticket = $this->setTicket($company_id,$thread_id,$channel_id,$item['attributes'],$owner);
 
-            $this->sendComment($company_id,$ticket_id,$owner,$from,$data,$files);
+
+            $this->sendComment($company_id,$ticket,$client,$channel,$from,$data,$files);
+
+
+            dispatch(new AddTicketContact(
+                 $company_id,
+                 $ticket,
+                 $comment_id,
+                 $client
+            ));
         }
 
         return 'ok';
@@ -98,9 +100,16 @@ class SyncController
         return $data;
     }
 
-    private function setChannel(string $email)
+    private function setChannel(string $email): array
     {
         $channel = DB::table('email_channels')->where('incoming_email', $email)->first();
+
+        $channel = [
+            'channel'=>[
+                'channel_type' => 'email',
+                'channel_id'   => $channel->id,
+            ],
+        ];
 
         return $channel;
     }
@@ -132,7 +141,7 @@ class SyncController
         return $result;
     }
 
-    private function setClient(array $from,int $company_id): int
+    private function setClient(array $from,int $company_id): array
     {
         $name = $from[0]['name'] ?? '';
         $name = explode(' ', $name);
@@ -150,40 +159,48 @@ class SyncController
             $params
         ));
 
-        return $client_id;
+        $client = [ 
+            $client_id => $from[0]['email']
+        ];
+
+        return $client;
     }
 
-    private function sendComment(int $company_id, int $ticket_id, array $owner,array $from,array $data,array $files = []): int
+    private function sendComment(int $company_id, $ticket, array $client, array $channel, array $data, array $files = []): int
     {
-        $requestData = [ 
-            // 'user_type'    => 'client',
-            'message_type' => 'public',
-            'message' => $attributes['body'],
-            'subject' => $attributes['subject'],
-            'is_html' => true,
-            'has_file' => !empty($files),
-            'all_data' => $data,
-            'channel'=>[
-                'channel_type' => 'email',
-                'channel_id' => $channel->id,
+        $ticketData = [ 
+            'title'                 => $data['subject'],
+            'id'                    => $ticket->id;
+            'current_status_id'     => $ticket->status_id;
+            'is_rated'              => $ticket->is_rated;
+            'last_updated_at'       => $ticket->last_updated_at;
+            'lastClientMessage'     => $data['body_quotes'],
+            'is_html'               => true,
+            'has_file'              => !empty($files),
+        ];
+
+        $commentData = [
+            'message'=>[
+                'type' => 'public',
+                'body' => $data['body'],
+                'is_first' => '',
             ],
-            'from_client' => [
-                $client_id => $from[0]['email']
-            ]
         ];
 
         dispatch(new AddComment(
             $company_id,
-            $ticket_id,
-            $user_id = 0,
-            $owner,
-            $requestData,
+            $user_id = null,
+            $owner = null,
+            $channel,
+            $client,
+            $commentData,
+            $ticketData,
             $files
         ));
     }
 
 
-    private function setTicket(int $company_id, int $thread_id, int $channel_id, array $attributes,array $owner): int
+    private function setTicket(int $company_id, int $thread_id, int $channel_id, array $attributes,array $owner)
     {
         preg_match('/\<span ticket_id="([0-9]+)">/i', $attributes['body'], $matches);
 
@@ -202,6 +219,8 @@ class SyncController
             $attributes['subject'],
             $data['date']
         ));
+
+        return $ticket;
     }
 
 }
