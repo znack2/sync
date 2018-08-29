@@ -59,11 +59,20 @@ class SyncController
         return 'ok';
     }
 
-
-    public function callback(Request $request,string $auth_code)
+     /**
+     */
+    public function callback(Request $request,string $auth_code): string
     {
-        // 'auth_code'     => $this->requestData['auth_code'],
-        
+        $params = [
+            'auth_code'     => $auth_code,//$this->requestData['auth_code'],
+            'email_address' => $auth_code,
+        ];
+
+        $path = 'http://' . env('SYC_ENGINE_HOST', 'localhost') . ':5555' . '/connect/authorize';
+
+        $result = $this->helper->call($path,$params);
+
+        return $result['account_id'];
     }
 
 

@@ -6,12 +6,12 @@ Route::group([
 ], function () {
 
 	Route::post('/create', 						
-    	['uses' => 'SyncController@create', 							
+    	['uses' => '\Usedesk\SyncIntegration\Controllers\SyncController@create',					
     	 'as' 	=> 'sync.create'
 	]);
 
 	Route::post('/callback', 						
-    	['uses' => 'SyncController@callback', 							
+    	['uses' => '\Usedesk\SyncIntegration\Controllers\SyncController@callback',       				
     	 'as' 	=> 'sync.callback'
 	]);
 });

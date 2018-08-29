@@ -22,7 +22,12 @@ class ActivateChannel extends AbstractJob
 
     public function handle(): JsonResponse
     {
-
+        $data = [];
+        
+        //if update account
+        if (isset($this->requestData['activate'])) {
+            $data['reauth'] = true;
+        }
     }
 
 }
