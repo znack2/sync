@@ -60,6 +60,13 @@ class SyncController
     }
 
 
+    public function callback(Request $request,string $auth_code)
+    {
+        // 'auth_code'     => $this->requestData['auth_code'],
+        
+    }
+
+
     // if (dispatch_now(new CheckDouble($channel->company_id, $client_id, $data['subject'], $data['date']))) {
     //     return false;
     // }

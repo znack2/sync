@@ -25,7 +25,7 @@ class CreateChannel extends AbstractJob
     {
         $params = $this->formatParams($this->data,$this->params);
 
-        $path = 'http://' . $this->url . '/connect/authorize';
+        $path = 'http://' . env('SYC_ENGINE_HOST', 'localhost') . ':5555' . '/connect/authorize';
 
         $result = $this->helper->call($path,$params);
 
@@ -36,37 +36,34 @@ class CreateChannel extends AbstractJob
         return $message;
     }
 
-    private function formatParams(array $data = [], array $params = []): array
+    private function formatParams(array $requestData = [], array $params = []): array
     {
         if(!empty($params)){
-            $settings = [
-                'imap_host'         => $data['params.imap.host'],
-                'imap_port'         => $data['params.imap.port'] ?? 993,
-                'imap_username'     => $data['params.imap.username'] 
-                                            ??  $data['incoming_email'],
-                'imap_password'     => $data['params.imap.password'],
-                'smtp_host'         => $data['params.smtp.host'],
-                'smtp_port'         => $data['params.smtp.port'] ?? 465,
-                'smtp_username'     => $data['params.smtp.username'] 
-                                            ??  $data['outgoing_email'],
-                'smtp_password'     => $data['params.smtp.password'],
-                //change to imap_encrypt
-                //change to smtp_encrypt
-                'ssl_required'      => $data['ssl_required'] ?? true,
-                'auth_code'         => $data['auth_code'] ?? 'get',
-                // token
+            $$data['settings'] = [
+                'imap_host'         => $requestData['params.imap.host'],
+                'imap_port'         => $requestData['params.imap.port'] ?? 993,
+                'imap_username'     => $requestData['params.imap.username'] 
+                                            ??  $requestData['incoming_email'],
+                'imap_password'     => $requestData['params.imap.password'],
+                'smtp_host'         => $requestData['params.smtp.host'],
+                'smtp_port'         => $requestData['params.smtp.port'] ?? 465,
+                'smtp_username'     => $requestData['params.smtp.username'] 
+                                            ??  $requestData['outgoing_email'],
+                'smtp_password'     => $requestData['params.smtp.password'],
+                'ssl_required'      => $requestData['ssl_required'] ?? true,
             ];
         }
 
-        $data = [
-            'name'          => $this->data['name'],
-            'email_address' => $this->data['incoming_email'],
-            'reauth'        => (bool) data['external'], 
-            'password'      => $this->settings['imap.password'],
-            'settings'      => $settings,
-            'auth_code'     => $this->data['auth_code'],
-        ];
+        if(!in_array($requestData['provider'],['google','yandex'])){
+            $data = [
+                'name'          => $this->requestData['name'],
+                'reauth'        => (bool) requestData['external'], 
+                'password'      => $this->settings['imap.password'],
+            ];
+        }
 
+        $data['email_address'] = $this->requestData['incoming_email'];
+        
         return $params;
     }
 }
