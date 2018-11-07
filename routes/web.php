@@ -1,28 +1,28 @@
 <?php declare(strict_types=1);
 
 Route::group([
-    'prefix' => config('app.version').'/syncEngine'
+    'prefix' => 'api/'.config('app.version'). '/sync'
     // 'middleware' => 'checkToken'
 ], function () {
 
-	Route::get('/test', function () {
-		echo "test ok";						
-    });
+	Route::get('/test', function(){
+		return 'module sync ok';
+	});
 
-	Route::post('/syncEngine', 						
-    	['uses' => 'SyncController@syncEngine', 							
-    	 'as' 	=> 'sync.syncEngine'
+	Route::post('/create', 						
+    	['uses' => '\Usedesk\SyncIntegration\Controllers\SyncController@create',
+    	// ['uses' => '\Usedesk\SyncIntegration\Controllers\TestController@create',
+    	 'as' 	=> 'sync.create'
 	]);
 
-	Route::post('/create-channel', 						
-    	['uses' => 'SyncController@createChannel', 							
-    	 'as' 	=> 'sync.createChannel'
-	]);
+	/* ================== callback ================== */
 
-	Route::get('/accounts', 						
-    	['uses' => 'SyncController@accounts', 							
-    	 'as' 	=> 'sync.accounts'
-	]);
+	Route::get('callback',
+	    // ['uses' => 'Channel\EmailChannelController@callback',
+	     // 'as'   => 'channels.email.callback'
+		['uses' => '\Usedesk\SyncIntegration\Controllers\CallbackController@callback',
+	     'as'   => 'sync.callback'
+	 ]);
 });
 
 

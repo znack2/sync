@@ -2,82 +2,87 @@
 
 namespace Usedesk\SyncIntegration\Jobs;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
+use App\Helpers\System\CurlHelper;
 
-use Usedesk\SyncIntegration\Helpers\SyncEngineHelper;
+use Usedesk\SyncIntegration\Exceptions\SyncException;
 
-class CreateChannel implements ShouldQueue {
+use App\Jobs\AbstractJob;
 
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $helper;
-    
-    private $name;
-    private $email;
-    private $password;
+
+
+class CreateChannel extends AbstractJob
+{
     private $params;
-    private $reauth;
+    private $requestData;
+    private $helper;
 
-    private $syncHelper;
-
-    public function __construct(string $name, string $email, string $password = '', array $params = [], $reauth = false)
+     /**
+     */
+    public function __construct(array $requestData = [],array $params = [])
     {
-        $this->name = $name;
-        $this->email = $email;
-        $this->password = $password;
         $this->params = $params;
-        $this->reauth = $reauth;
-        $this->helper = new SyncEngineHelper;
+        $this->requestData = $requestData;
+        $this->helper = new CurlHelper;
     }
 
-    public function handle()
+     /**
+     */
+    public function handle(): array
     {
-        $params = [
-            'name' => $this->name,
-            'email_address' => $this->email,
-            'reauth' => $this->reauth,
-        ];
+        $params = $this->formatParams($this->requestData,$this->params);
 
-        if (!empty($this->params['auth_code'])) {
-            $params['auth_code'] = $this->params['auth_code'];
-            unset($this->params['auth_code']);
+        $path = 'http://' . env('SYC_ENGINE_HOST', 'localhost') . ':5555' . '/connect/authorize';
+
+        $result = $this->helper->call($path,$params);
+
+        if (!empty($result['type']) && $result['type'] == 'api_error') { //in_array($result['type'],['api_error','oauth']
+            throw new SyncException($result['message']);
         }
 
-        if ($this->password) {
-            $params['password'] = $this->password;
-        }
-
-        if ($this->params) {
-            $params['settings'] = $params;
-        }
-
-        $result = $this->helper->createAccount($params);
-
-        if (!empty($result['type'])) {
-            return [
-                'success' => false,
-                'type' => $result['type'],
-                'message' => $result['message'],
-            ];
-        }
-
-        if (!empty($result['oauth2_url'])) {
-            return [
-                'success' => false,
-                'type' => 'oauth',
-                'oauth2_url' => $result['oauth2_url'],
-            ];
-        }
-
-        return [
-            'success' => true,
-            'type' => 'success',
-            'data' => $result,
-        ];
+        return $result;
     }
 
+     /**
+     */
+    private function formatParams(array $requestData = [], array $params = []): array
+    {
+        if(!empty($params)){
+            $data['settings'] = [
+                'imap_host'     => $params['imap']['host'] ?? null,
+                'imap_port'     => $params['imap']['port'] ?? 993,
+                'imap_username' => $params['imap']['username'] ?? $requestData['incoming_email'],
+                'imap_password' => $params['imap']['password'] ?? $requestData['password'],
+
+                'smtp_host'     => $params['smtp']['host'] ?? null,
+                'smtp_port'     => $params['smtp']['port'] ?? 465,
+                'smtp_username' => $params['smtp']['username'] ?? $requestData['outgoing_email'],
+                'smtp_password' => $params['smtp']['password'] ?? $requestData['password'],
+                
+                'ssl_required'  => ($params['smtp']['encrypt'] || $params['imap']['encrypt'] || null) 
+            ];
+        }
+
+        // 'reauth'        => (bool) requestData['external'], 
+
+        $data['name']           = $requestData['name'];
+        $data['email_address']  = $requestData['incoming_email'];
+        $data['provider']       = $this->getProvider($requestData['incoming_email']) ?? 'imap';
+
+        if(!in_array($data['provider'],['gmail','yandex'])){
+            $data['password'] = $requestData['password'];
+            unset($data['provider']);
+        }
+
+        return $data;
+    }
+
+    private function getProvider(string $email): string
+    {
+        $provider = strtok(substr(strrchr($email, "@"), 1), '.');
+
+        return $provider;
+    }
 }
+
+

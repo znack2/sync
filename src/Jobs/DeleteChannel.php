@@ -1,27 +1,40 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace Usedesk\SyncIntegration\Jobs;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
+use App\Helpers\System\CurlHelper;
 
-class DeleteChannel implements ShouldQueue
+use Usedesk\SyncIntegration\Exceptions\SyncException;
+
+use App\Jobs\AbstractJob;
+
+
+
+class DeleteChannel extends AbstractJob
 {
+    protected $account_id;
+    private $helper;
 
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    protected $channel_id;
-
-    public function __construct(string $channel_id)
+     /**
+     */
+    public function __construct(string $account_id)
     {
-        $this->channel_id = $channel_id;
+        $this->account_id = $account_id;
+        $this->helper = new CurlHelper;
     }
 
+     /**
+     */
     public function handle()
     {
+        $path = 'http://' . env('SYC_ENGINE_HOST', 'localhost') . ':5555' . '/account/purge';
 
+        $result = $this->helper->call($path,[],$this->account_id);
+
+        if (!empty($result['type']) && $result['type'] == 'api_error') { //in_array($result['type'],['api_error','oauth']
+            throw new SyncException($result['message']);
+        }
+
+        return $result;
     }
-
 }
