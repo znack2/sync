@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Usedesk\SyncIntegration\Services;
+namespace Freshplan\Sync\Services;
 
 use Carbon\Carbon;
 use Exception;

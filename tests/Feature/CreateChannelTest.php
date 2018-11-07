@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Usedesk\SyncIntegration\Tests\Feature;
+namespace Freshplan\Sync\Tests\Feature;
 
-use Usedesk\SyncIntegration\Tests\TestCase;
+use Freshplan\Sync\Tests\TestCase;
 
 // use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Response;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Usedesk\SyncIntegration\Exceptions;
+namespace Freshplan\Sync\Exceptions;
 
 class SyncException extends \Exception {
 

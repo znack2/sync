@@ -10,7 +10,7 @@ Route::group([
 	});
 
 	Route::post('/create', 						
-    	['uses' => '\Usedesk\SyncIntegration\Controllers\SyncController@create',
+    	['uses' => '\Freshplan\Sync\Controllers\SyncController@create',
     	// ['uses' => '\Usedesk\SyncIntegration\Controllers\TestController@create',
     	 'as' 	=> 'sync.create'
 	]);
@@ -20,7 +20,7 @@ Route::group([
 	Route::get('callback',
 	    // ['uses' => 'Channel\EmailChannelController@callback',
 	     // 'as'   => 'channels.email.callback'
-		['uses' => '\Usedesk\SyncIntegration\Controllers\CallbackController@callback',
+		['uses' => '\Freshplan\Sync\Controllers\CallbackController@callback',
 	     'as'   => 'sync.callback'
 	 ]);
 });

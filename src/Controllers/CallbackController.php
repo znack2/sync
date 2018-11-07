@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Usedesk\SyncIntegration\Controllers;
+namespace Freshplan\Sync\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;

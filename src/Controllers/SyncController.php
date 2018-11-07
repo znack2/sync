@@ -1,6 +1,6 @@
 <?php
 
-namespace Usedesk\SyncIntegration\Controllers;
+namespace Freshplan\Sync\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

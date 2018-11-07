@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Usedesk\SyncIntegration;
+namespace Freshplan\Sync;
 
 use Illuminate\Support\ServiceProvider;
 

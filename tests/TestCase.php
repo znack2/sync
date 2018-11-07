@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Usedesk\SyncIntegration\Tests;
+namespace Freshplan\Sync\Tests;
 
 use GrahamCampbell\TestBench\AbstractPackageTestCase;
 // use Orchestra\Testbench\TestCase;
 
-use Usedesk\SyncIntegration\SyncServiceProvider;
-use Usedesk\SyncIntegration\ServiceProvider;
+use Freshplan\Sync\SyncServiceProvider;
+use Freshplan\Sync\ServiceProvider;
 
 abstract class TestCase extends AbstractPackageTestCase
 {

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Usedesk\SyncIntegration\Service;
+namespace Freshplan\Sync\Service;
 
 class SyncEngineService 
 {

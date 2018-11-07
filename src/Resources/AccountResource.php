@@ -1,6 +1,6 @@
 <?php
 
-namespace Usedesk\SyncIntegration\Resources;
+namespace Freshplan\Sync\Resources;
 
 use App\Http\Resources\VersionResource;
 use App\Helpers\Project\TimeHelper;

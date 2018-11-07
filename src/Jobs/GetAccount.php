@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Usedesk\SyncIntegration\Jobs;
+namespace Freshplan\Sync\Jobs;
 
 use Usedesk\SyncIntegration\Service\SyncEngineService;
 use Usedesk\SyncIntegration\Resources\AccountCollection;

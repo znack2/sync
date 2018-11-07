@@ -1,6 +1,7 @@
 <?php
 
-namespace Usedesk\SyncIntegration\Controllers;
+namespace Freshplan\Sync\Controllers;
+
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
