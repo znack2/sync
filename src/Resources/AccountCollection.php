@@ -3,7 +3,7 @@
 namespace Freshplan\Sync\Resources;
 
 use App\Http\Resources\Base\BaseResourceCollection;
-use Usedesk\SyncIntegration\Resources\AccountResource;
+use Freshplan\Sync\\Resources\AccountResource;
 
 class AccountCollection extends BaseResourceCollection
 {

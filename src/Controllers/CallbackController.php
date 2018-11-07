@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 
 use Illuminate\Support\Facades\DB;
 
-use Usedesk\SyncIntegration\Exceptions\SyncException;
+use Freshplan\Sync\\Exceptions\SyncException;
 
 use App\Helpers\System\{
 	ResponseHelper,

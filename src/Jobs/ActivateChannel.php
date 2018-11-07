@@ -2,7 +2,7 @@
 
 namespace Freshplan\Sync\Jobs;
 
-use Usedesk\SyncIntegration\Service\SyncEngineService;
+use Freshplan\Sync\\Service\SyncEngineService;
 
 use App\Jobs\AbstractJob;
 

@@ -4,7 +4,7 @@ namespace Freshplan\Sync\Jobs;
 
 use App\Helpers\System\CurlHelper;
 
-use Usedesk\SyncIntegration\Exceptions\SyncException;
+use Freshplan\Sync\\Exceptions\SyncException;
 
 use App\Jobs\AbstractJob;
 

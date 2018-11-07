@@ -2,8 +2,8 @@
 
 namespace Freshplan\Sync\Jobs;
 
-use Usedesk\SyncIntegration\Service\SyncEngineService;
-use Usedesk\SyncIntegration\Resources\AccountCollection;
+use Freshplan\Sync\\Service\SyncEngineService;
+use Freshplan\Sync\\Resources\AccountCollection;
 
 use App\Jobs\AbstractJob;
 
