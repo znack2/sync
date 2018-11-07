@@ -5,15 +5,24 @@ Route::group([
     // 'middleware' => 'checkToken'
 ], function () {
 
+	Route::get('/test', function(){
+		return 'module sync ok';
+	});
+
 	Route::post('/create', 						
-    	['uses' => '\Usedesk\SyncIntegration\Controllers\SyncController@create',					
+    	['uses' => '\Usedesk\SyncIntegration\Controllers\SyncController@create',
+    	// ['uses' => '\Usedesk\SyncIntegration\Controllers\TestController@create',
     	 'as' 	=> 'sync.create'
 	]);
 
-	Route::post('/callback', 						
-    	['uses' => '\Usedesk\SyncIntegration\Controllers\SyncController@callback',       				
-    	 'as' 	=> 'sync.callback'
-	]);
+	/* ================== callback ================== */
+
+	Route::get('callback',
+	    // ['uses' => 'Channel\EmailChannelController@callback',
+	     // 'as'   => 'channels.email.callback'
+		['uses' => '\Usedesk\SyncIntegration\Controllers\CallbackController@callback',
+	     'as'   => 'sync.callback'
+	 ]);
 });
 
 
