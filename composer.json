@@ -15,12 +15,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Usedesk\\SyncIntegration\\": "src"
+      "Freshplan\\Sync\\": "src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Usedesk\\SyncIntegration\\Tests\\": "tests"
+      "Freshplan\\Sync\\Tests\\": "tests"
     },
     "files": [
       "vendor/phpunit/phpunit/src/Framework/Assert/Functions.php"
@@ -32,7 +32,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Usedesk\\SyncIntegration\\ServiceProvider"
+        "Freshplan\\Sync\\SyncServiceProvider"
       ]
     }
   },
