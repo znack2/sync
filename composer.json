@@ -1,5 +1,5 @@
 {
-  "name": "Usedesk/SyncIntegration",
+  "name": "freshplan/sync",
   "description": "A sync engine integration",
   "license": "MIT",
   "require": {
